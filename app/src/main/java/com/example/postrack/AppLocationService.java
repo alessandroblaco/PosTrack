@@ -1,6 +1,7 @@
 package com.example.postrack;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.app.Service;
@@ -17,6 +18,7 @@ import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
+import android.text.format.DateFormat;
 import android.widget.TextView;
 
 public class AppLocationService extends Service implements LocationListener {
@@ -112,20 +114,37 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		log("Location changed from : " + location.getProvider());
-		if (
-			(lastBestLocation != null && lastBestLocation.getProvider().equals("gsm"))
-				||
-			(location.getProvider().equals(LocationManager.GPS_PROVIDER))
-				||
-			(location.getProvider().equals(LocationManager.NETWORK_PROVIDER) && GPSEnabled == false)
-				||
-			(location.getProvider().equals("gsm") && NWEnabled == false && GPSEnabled == false)
-			) {
-			locationHistory.add(location);
-			lastBestLocation = location;
-			log("\n" + "New position from : " + location.getProvider());
-			log("Lat: " + String.valueOf(location.getLatitude()) + ", Lon: " + String.valueOf(location.getLongitude()) + "\n");
+		if (location == null) {
+			log("Null location");
+		} else {
+			log("Location changed from : " + location.getProvider());
+			if (
+					(lastBestLocation != null && lastBestLocation.getProvider().equals("gsm"))
+							||
+							(location.getProvider().equals(LocationManager.GPS_PROVIDER))
+							||
+							(location.getProvider().equals(LocationManager.NETWORK_PROVIDER) && GPSEnabled == false)
+							||
+							(location.getProvider().equals("gsm") && NWEnabled == false && GPSEnabled == false)
+					) {
+				locationHistory.add(location);
+				lastBestLocation = location;
+				log("\n" + "New position from : " + location.getProvider());
+				log("Lat: " + String.valueOf(location.getLatitude()) + ", Lon: " + String.valueOf(location.getLongitude()) + "\n");
+				Location locationB = new Location("point B");
+
+				locationB.setLatitude(45.5032028);
+				locationB.setLongitude(9.1561746);
+				float distance = location.distanceTo(locationB);
+
+				log("Distance from Bovisa is " + String.valueOf(distance) +  "m");
+				if (distance > 100) {
+					log("You are fare away");
+				} else {
+					log("You are close to Bovisa");
+				}
+			}
+
 		}
 	}
 	
@@ -183,11 +202,15 @@ public class AppLocationService extends Service implements LocationListener {
 	public void updateGSM() {
 		if (lastBestLocation == null || lastBestLocation.getTime() + 5*1000.0 < System.currentTimeMillis()) {
 			log("Update from GSM");
-			Location loc = telephonyHelper.getLocationEstimate();
-			if (loc == null) {
-				log("Failed...");
-			} else {
-				onLocationChanged(loc);
+			try {
+				Location loc = telephonyHelper.getLocationEstimate();
+				if (loc == null) {
+					log("Failed...");
+				} else {
+					onLocationChanged(loc);
+				}
+			} catch (Exception e) {
+				log("Error in GSM: " + e.toString());
 			}
 		} else {
 			log("No update because too soon");
@@ -221,7 +244,8 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	public void log(String str) {
 		if (t != null) {
-			t.append("\n" + str);
+			Date d = new Date();
+			t.append("\n" + DateFormat.format("yyyy-MM-dd hh:mm:ss", d.getTime()) + ": " + str);
 		}
 	}
 

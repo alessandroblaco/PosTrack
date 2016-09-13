@@ -16,12 +16,12 @@
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/res/drawable-mdpi-v4/common_google_signin_btn_text_dark_normal.9.png"
     },
     {
-        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_btn_radio_to_on_mtrl_015.png",
-        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.0/res/drawable-mdpi-v4/abc_btn_radio_to_on_mtrl_015.png"
-    },
-    {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/common_plus_signin_btn_icon_light_focused.9.png",
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/res/drawable-mdpi-v4/common_plus_signin_btn_icon_light_focused.9.png"
+    },
+    {
+        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_btn_radio_to_on_mtrl_015.png",
+        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.0/res/drawable-mdpi-v4/abc_btn_radio_to_on_mtrl_015.png"
     },
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-mdpi-v4/abc_btn_switch_to_on_mtrl_00001.9.png",
