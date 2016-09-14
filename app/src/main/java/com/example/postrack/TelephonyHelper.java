@@ -314,6 +314,8 @@ public class TelephonyHelper {
         if (tm == null)
             return null;
         Location loc = weightedAverage("gsm", getTowerLocations());
+        if (loc == null)
+            return null;
         loc.setProvider("gsm");
         loc.setTime(System.currentTimeMillis());
         return loc;

@@ -1,14 +1,20 @@
 package com.example.postrack;
 
 import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.location.Location;
 import android.net.Uri;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.os.IBinder;
 import android.view.MenuItem;
@@ -18,15 +24,28 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.text.method.ScrollingMovementMethod;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.postrack.AppLocationService.LocalBinder;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends Activity{
 
     private TelephonyHelper th;
     private Location lastloc;
+    private RequestQueue mRequestQueue;
+    private WifiManager wifi;
+    private List<ScanResult> results;
     TextView t1;
 	
 	AppLocationService appLocationService;
@@ -42,6 +61,7 @@ public class MainActivity extends Activity{
         th = new TelephonyHelper(context);
         t1=(TextView)findViewById(R.id.TextView01); 
         t1.setMovementMethod(new ScrollingMovementMethod());
+        mRequestQueue = Volley.newRequestQueue(getApplicationContext());
 
 
 		final Button button = (Button) findViewById(R.id.button1);
@@ -55,7 +75,7 @@ public class MainActivity extends Activity{
 				if (mapIntent.resolveActivity(getPackageManager()) != null) {
 					startActivity(mapIntent);
 				}
-			}
+            }
 		});
 
 

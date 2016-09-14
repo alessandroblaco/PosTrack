@@ -1,5 +1,8 @@
 package com.example.postrack;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,6 +13,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -19,7 +23,15 @@ import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.widget.TextView;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 
 public class AppLocationService extends Service implements LocationListener {
 
@@ -31,10 +43,12 @@ public class AppLocationService extends Service implements LocationListener {
 	private Boolean NWEnabled = true;
 	private Boolean GSMEnabled = false;
 	private TextView t;
+    private Boolean lastnear = false;
+    private Context mcontext;
 
 
 	private static final long MIN_DISTANCE_FOR_UPDATE = 100; // 100 meters
-	private static final long MIN_TIME_FOR_UPDATE = 1000 * 60 * 5; // 5 minutes
+	private static final long MIN_TIME_FOR_UPDATE = 1000 * 30 * 1; // 5 minutes
     private TelephonyManager telephonyManager;
     private PhoneStateListener telephonyListener = new PhoneStateListener() {
         public void onServiceStateChanged(ServiceState serviceState) {
@@ -62,6 +76,7 @@ public class AppLocationService extends Service implements LocationListener {
 		t.setTextIsSelectable(true);
 	}
 	public void setContext(Context context) {
+        mcontext = context;
 	    locationManager = (LocationManager) context
 	            .getSystemService(LOCATION_SERVICE);
 	    telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -138,11 +153,57 @@ public class AppLocationService extends Service implements LocationListener {
 				float distance = location.distanceTo(locationB);
 
 				log("Distance from Bovisa is " + String.valueOf(distance) +  "m");
+				String par;
 				if (distance > 100) {
 					log("You are fare away");
+					par = "0";
 				} else {
 					log("You are close to Bovisa");
+					par = "1";
 				}
+
+
+                try
+                {
+                    TelephonyManager telephonyService = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+
+                    Method setMobileDataEnabledMethod = telephonyService.getClass().getDeclaredMethod("setDataEnabled", boolean.class);
+
+                    if (null != setMobileDataEnabledMethod)
+                    {
+                        setMobileDataEnabledMethod.invoke(telephonyService, true);
+                        Log.v("postrack", "Mobile data enabled");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.e("postrack", "Error setting mobile data state", ex);
+                }
+
+
+                if (true){//par.equals("1") && !lastnear || par.equals("0") && lastnear) {
+                    RequestQueue queue = Volley.newRequestQueue(this);
+                    String url = "http://milano.cngei.it/iot/app.php?arrivo=" + par;
+                    log("Calling " + url);
+
+                    // Request a string response from the provided URL.
+                    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.v("postrack", "Response is: " + response);
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.v("postrack", "Error: " + error.toString());
+                        }
+                    });
+                    // Add the request to the RequestQueue.
+                    queue.add(stringRequest);
+                } else {
+                    log("No need for update");
+                }
 			}
 
 		}
@@ -195,6 +256,16 @@ public class AppLocationService extends Service implements LocationListener {
 					telephonyListener,
 					PhoneStateListener.LISTEN_NONE
 				);
+            try {
+                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
+            } catch (SecurityException e) {
+                log("Permission error: " + e.toString());
+            }
+            try {
+                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
+            } catch (SecurityException e) {
+                log("Permission error: " + e.toString());
+            }
 			
 		}
 	}
@@ -246,6 +317,7 @@ public class AppLocationService extends Service implements LocationListener {
 		if (t != null) {
 			Date d = new Date();
 			t.append("\n" + DateFormat.format("yyyy-MM-dd hh:mm:ss", d.getTime()) + ": " + str);
+            Log.v("postrack", str);
 		}
 	}
 
