@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="use_android_provider"
+        android:summary="@string/pref_description_use_android_provider"
+        android:title="@string/pref_title_use_android_provider" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_gps_interval"
+        android:inputType="number"
+        android:key="gps_interval"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="use_android_provider"
+        android:title="@string/pref_title_gps_interval"/>
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_nw_interval"
+        android:inputType="number"
+        android:key="nw_interval"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="use_android_provider"
+        android:title="@string/pref_title_nw_interval"/>
+
+</PreferenceScreen>

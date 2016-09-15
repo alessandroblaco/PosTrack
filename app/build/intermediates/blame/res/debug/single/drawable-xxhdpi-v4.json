@@ -36,6 +36,10 @@
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/drawable-xxhdpi-v4/abc_btn_check_to_on_mtrl_015.png"
     },
     {
+        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_notifications_black_24dp.png",
+        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/src/main/res/drawable-xxhdpi/ic_notifications_black_24dp.png"
+    },
+    {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/common_ic_googleplayservices.png",
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/res/drawable-xxhdpi-v4/common_ic_googleplayservices.png"
     },
@@ -138,6 +142,10 @@
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/common_plus_signin_btn_text_dark_pressed.9.png",
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/res/drawable-xxhdpi-v4/common_plus_signin_btn_text_dark_pressed.9.png"
+    },
+    {
+        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_info_black_24dp.png",
+        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/src/main/res/drawable-xxhdpi/ic_info_black_24dp.png"
     },
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/abc_ic_star_black_16dp.png",
@@ -274,6 +282,10 @@
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/common_plus_signin_btn_text_light_disabled.9.png",
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/res/drawable-xxhdpi-v4/common_plus_signin_btn_text_light_disabled.9.png"
+    },
+    {
+        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/ic_sync_black_24dp.png",
+        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/src/main/res/drawable-xxhdpi/ic_sync_black_24dp.png"
     },
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/drawable-xxhdpi-v4/common_full_open_on_phone.png",

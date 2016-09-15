@@ -1,6 +1,16 @@
 package com.example.postrack;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.location.Location;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,13 +23,48 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    boolean mIsBound;
+    private Messenger mService = null;
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+    private List<Location> locationHistory;
+    private GoogleMap mMap;
 
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case AppLocationService.MSG_SET_LOCATION_HISTORY:
+                    locationHistory = msg.getData().getParcelableArrayList("history");
+                    doUpdateMap();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            mService = new Messenger(service);
+            try {
+                Message msg = Message.obtain(null, AppLocationService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+                askLocationUpdate();
+            }
+            catch (RemoteException e) {
+                // In this case the service has crashed before we could even do anything with it
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been unexpectedly disconnected - process crashed.
+            mService = null;
+            Log.i("postrack", "Disconnected.");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +74,75 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        if (!AppLocationService.isRunning()) {
+            startService(new Intent(MapsActivity.this, AppLocationService.class));
+        }
+        doBindService();
+    }
+
+    private void askLocationUpdate() {
+        if (mIsBound) {
+            if (mService != null) {
+                try {
+                    Message msg = Message.obtain(null, AppLocationService.MSG_ASK_FOR_UPDATE, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                }
+                catch (RemoteException e) {
+                    // the service has crashed
+                }
+            }
+        }
+    }
+
+    void doUpdateMap() {
+        if (mMap != null) {
+            mMap.clear();
+            PolylineOptions rectOptions = new PolylineOptions();
+
+            for (int i = 0; i < locationHistory.size(); i++) {
+                Location loc = locationHistory.get(i);
+                LatLng center = new LatLng(loc.getLatitude(), loc.getLongitude());
+                rectOptions.add(center);
+                if (i == locationHistory.size() - 1) {
+                    mMap.addMarker(new MarkerOptions().position(center).title("Ultima posizione da " + loc.getProvider() + " (+- " + String.valueOf(loc.getAccuracy()) + "m)"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));// Instantiates a new Polyline object and adds points to define a rectangle
+                }
+                mMap.addCircle(new CircleOptions()
+                        .center(center)
+                        .radius(loc.getAccuracy())
+                        .strokeColor(Color.argb(220, 0, 206, 209))
+                        .strokeWidth(3));
+            }
+            mMap.addPolyline(rectOptions
+                    .width(6).color(Color.argb(80, 0, 0, 0)));
+
+        }
+    }
+
+    void doBindService() {
+        bindService(new Intent(this, AppLocationService.class), mConnection, Context.BIND_AUTO_CREATE);
+        mIsBound = true;
+        Log.i("postrack", "Binding.");
+    }
+    void doUnbindService() {
+        if (mIsBound) {
+            // If we have received the service, and hence registered with it, then now is the time to unregister.
+            if (mService != null) {
+                try {
+                    Message msg = Message.obtain(null, AppLocationService.MSG_UNREGISTER_CLIENT);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                }
+                catch (RemoteException e) {
+                    // There is nothing special we need to do if the service has crashed.
+                }
+            }
+            // Detach our existing connection.
+            unbindService(mConnection);
+            mIsBound = false;
+            Log.i("postrack", "Unbinding.");
+        }
     }
 
 
@@ -42,34 +156,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * installed Google Play services and returned to the app.
      */
     @Override
-    public void onMapReady(GoogleMap mMap) {
-        Bundle extras = getIntent().getExtras();
-        // Add a marker in Sydney and move the camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.461, 9.191), 15));// Instantiates a new Polyline object and adds points to define a rectangle
-        PolylineOptions rectOptions = new PolylineOptions();
-        if (extras != null) {
-            String single = extras.getString("positions");
-            try {
-                List<String> history = new ArrayList<>(Arrays.asList(single.split(";")));
-                for (int i = 0; i < history.size(); i++) {
-                    List<String> position = new ArrayList<>(Arrays.asList(history.get(i).split(",")));
-                    LatLng center = new LatLng(Double.valueOf(position.get(0)), Double.valueOf(position.get(1)));
-                    rectOptions.add(center);
-                    if (i == history.size() - 1) {
-                        mMap.addMarker(new MarkerOptions().position(center).title("Ultima posizione (+- " + String.valueOf(position.get(2)) + "m)"));
-                    }
-                    mMap.addCircle(new CircleOptions()
-                            .center(center)
-                            .radius(Double.valueOf(position.get(2)))
-                            .strokeColor(Color.argb(220, 0, 206, 209))
-                            .strokeWidth(3));
-                }
-            } catch (NullPointerException e) {
-                Log.v("Map", "Error: " + e.toString());
-            }
-            //The key argument here must match that used in the other activity
+    public void onMapReady(GoogleMap gmMap) {
+        mMap = gmMap;
+        askLocationUpdate();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            doUnbindService();
         }
-        mMap.addPolyline(rectOptions
-                .width(6).color(Color.argb(80, 0, 0, 0)));
+        catch (Throwable t) {
+            Log.e("postrack", "Failed to unbind from the service", t);
+        }
     }
 }

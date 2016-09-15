@@ -76,6 +76,9 @@
             android:name="com.example.postrack.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity
+            android:name="com.example.postrack.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
             android:name="com.google.android.gms.common.api.GoogleApiActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />

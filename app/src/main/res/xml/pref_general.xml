@@ -1,0 +1,61 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="position_service_enabled"
+        android:summary="@string/pref_description_position_service_enabled"
+        android:title="@string/pref_title_position_service_enabled" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="update_url_enabled"
+        android:summary="@string/pref_description_update_url_enabled"
+        android:title="@string/pref_title_update_url_enabled" />
+
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue="@string/pref_default_update_url"
+        android:inputType="textUri"
+        android:key="update_url"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="update_url_enabled"
+        android:title="@string/pref_title_update_url" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_latitude"
+        android:inputType="numberSigned|numberDecimal"
+        android:key="home_latitude"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_latitude" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_longitude"
+        android:inputType="numberSigned|numberDecimal"
+        android:key="home_longitude"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_longitude" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_radius"
+        android:inputType="number"
+        android:key="home_radius"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_radius"/>
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="start_on_boot"
+        android:summary="@string/pref_description_start_on_boot"
+        android:title="@string/pref_title_start_on_boot" />
+
+</PreferenceScreen>
