@@ -140,12 +140,12 @@
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/layout/notification_template_part_time.xml"
     },
     {
-        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/layout/notification_template_lines.xml",
-        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/layout/notification_template_lines.xml"
-    },
-    {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/layout/abc_select_dialog_material.xml",
         "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/layout/abc_select_dialog_material.xml"
+    },
+    {
+        "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/layout/notification_template_lines.xml",
+        "source": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/res/layout/notification_template_lines.xml"
     },
     {
         "merged": "/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/merged/debug/layout/notification_media_cancel_action.xml",

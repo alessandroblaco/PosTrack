@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -98,6 +101,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     void doUpdateMap() {
         if (mMap != null) {
             mMap.clear();
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            Log.v("postrack", "lat: " + preferences.getString("home_latitude", "45.5032028"));
+            mMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(Double.valueOf(preferences.getString("home_latitude", "45.5032028")),Double.valueOf(preferences.getString("home_longitude", "9.1561746"))))
+                    .title("Home")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
             PolylineOptions rectOptions = new PolylineOptions();
 
             for (int i = 0; i < locationHistory.size(); i++) {
@@ -105,7 +114,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng center = new LatLng(loc.getLatitude(), loc.getLongitude());
                 rectOptions.add(center);
                 if (i == locationHistory.size() - 1) {
-                    mMap.addMarker(new MarkerOptions().position(center).title("Ultima posizione da " + loc.getProvider() + " (+- " + String.valueOf(loc.getAccuracy()) + "m)"));
+                    mMap.addMarker(new MarkerOptions().position(center).title("Last location by " + loc.getProvider() + " (+- " + String.valueOf(loc.getAccuracy()) + "m)"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 15));// Instantiates a new Polyline object and adds points to define a rectangle
                 }
                 mMap.addCircle(new CircleOptions()

@@ -72,10 +72,12 @@
 
         <activity
             android:name=".MapsActivity"
+            android:parentActivityName=".MainActivity"
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:parentActivityName=".MainActivity"
+            android:label="@string/title_activity_settings"/>
     </application>
 
 </manifest>

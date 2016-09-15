@@ -1,9 +1,14 @@
 package com.example.postrack;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
@@ -12,23 +17,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.preference.ListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -57,7 +55,8 @@ public class AppLocationService extends Service implements LocationListener {
 	ArrayList<Messenger> mClients = new ArrayList<>(); // Keeps track of all current registered clients.
 
 	static final int MSG_SET_LOCATION_HISTORY = 1;
-	static final int MSG_SET_LOG_MESSAGE = 3;
+    static final int MSG_ASK_FOR_LOG = 3;
+    static final int MSG_SET_LOG_MESSAGE = 3;
 	static final int MSG_REGISTER_CLIENT = 4;
 	static final int MSG_UNREGISTER_CLIENT = 5;
 	static final int MSG_ASK_FOR_UPDATE = 6;
@@ -67,6 +66,8 @@ public class AppLocationService extends Service implements LocationListener {
 	{
 		return isRunning;
 	}
+    private List<String> appLog = new ArrayList<>();
+    private static final int MAX_LOG_LINES = 80;
 
 	@Override
 	public void onCreate() {
@@ -144,21 +145,23 @@ public class AppLocationService extends Service implements LocationListener {
     private OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals("use_android_provider")) {
-                Boolean enabled = sharedPreferences.getBoolean(key, false);
-                log("Setting key " + key + " to " + String.valueOf(enabled));
-                canUseProvider = enabled;
-                updateProvidersConnection();
-            } else if (key.equals("gps_interval")) {
-				GpsProviderUpdateInterval = (int)(Float.valueOf(sharedPreferences.getString("gps_interval", "5")) * 60000f);
-				updateProvidersConnection();
-			} else if (key.equals("nw_interval")) {
-				NwProviderUpdateInterval = (int)(Float.valueOf(sharedPreferences.getString("nw_interval", "5")) * 60000f);
-				updateProvidersConnection();
-			} else if (key.equals("position_service_enabled")) {
-				Boolean enabled = sharedPreferences.getBoolean(key, false);
-				canUseGSM = enabled;
-				updateProvidersConnection();
+            switch (key) {
+                case "use_android_provider":
+                    canUseProvider = sharedPreferences.getBoolean(key, false);
+                    updateProvidersConnection();
+                    break;
+                case "gps_interval":
+                    GpsProviderUpdateInterval = (int)(Float.valueOf(sharedPreferences.getString("gps_interval", "5")) * 60000f);
+                    updateProvidersConnection();
+                    break;
+                case "nw_interval":
+                    NwProviderUpdateInterval = (int)(Float.valueOf(sharedPreferences.getString("nw_interval", "5")) * 60000f);
+                    updateProvidersConnection();
+                    break;
+                case "position_service_enabled":
+                    canUseGSM = sharedPreferences.getBoolean(key, false);
+                    updateProvidersConnection();
+                    break;
 			}
 		}
     };
@@ -175,7 +178,9 @@ public class AppLocationService extends Service implements LocationListener {
 				Bundle b = new Bundle();
 				/*b.putString("history", new Gson().toJson(locationHistory));*/
 				Message msg = Message.obtain(null, MSG_SET_LOCATION_HISTORY);
-                b.putParcelableArrayList ("history", (ArrayList)locationHistory);
+                ArrayList<Location> al = new ArrayList<>();
+                al.addAll(locationHistory);
+                b.putParcelableArrayList ("history", al);
 
                 msg.setData(b);
 				mClients.get(i).send(msg);
@@ -213,9 +218,12 @@ public class AppLocationService extends Service implements LocationListener {
 				case MSG_UNREGISTER_CLIENT:
 					mClients.remove(msg.replyTo);
 					break;
-				case MSG_ASK_FOR_UPDATE:
-					sendLocationUpdateToUI();
-					break;
+                case MSG_ASK_FOR_UPDATE:
+                    sendLocationUpdateToUI();
+                    break;
+                case MSG_ASK_FOR_LOG:
+                    sendLog();
+                    break;
 				default:
 					super.handleMessage(msg);
 			}
@@ -228,8 +236,7 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 
 
-	IBinder mBinder = new LocalBinder();
-	private List<Location> locationHistory = new ArrayList<>();
+	private LinkedList<Location> locationHistory = new LinkedList<>();
 	private Location lastBestLocation;
 	private Boolean GPSEnabled = true;
 	private Boolean NWEnabled = true;
@@ -257,11 +264,6 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	public AppLocationService() {
 	}
-	public class LocalBinder extends Binder {
-		public AppLocationService getServerInstance() {
-			return AppLocationService.this;
-		}
-	}
 	
 	@Override
 	public void onLocationChanged(Location location) {
@@ -278,7 +280,11 @@ public class AppLocationService extends Service implements LocationListener {
 							||
 							(location.getProvider().equals("gsm") && !NWEnabled && !GPSEnabled)
 					) {
-				locationHistory.add(location);
+
+				locationHistory.addLast(location);
+                if (locationHistory.size() > 7) {
+                    locationHistory.pollFirst();
+                }
 				lastBestLocation = location;
 				sendLocationUpdateToUI();
 				log("\n" + DateFormat.format("yyyy-MM-dd hh:mm:ss", location.getTime()) + ": New position from : " + location.getProvider());
@@ -302,6 +308,10 @@ public class AppLocationService extends Service implements LocationListener {
 
 
                 if (distance > max_distance && lastnear || distance <= max_distance && !lastnear) {
+					lastnear = distance <= max_distance;
+                    if (preferences.getBoolean("show_notifications", false)) {
+                        notifyPass(lastnear, distance);
+                    }
                     String url = preferences.getString("update_url", "http://emonbovisa.it/app.php?arrivo=") + arrivo;
                     if (preferences.getBoolean("update_url_enabled", true)) {
 						log("Calling " + url);
@@ -310,12 +320,12 @@ public class AppLocationService extends Service implements LocationListener {
 								new Response.Listener<String>() {
 									@Override
 									public void onResponse(String response) {
-										Log.v("postrack", "Response is: " + response);
+										log("Response is: " + response);
 									}
 								}, new Response.ErrorListener() {
 							@Override
 							public void onErrorResponse(VolleyError error) {
-								Log.v("postrack", "Error: " + error.toString());
+                                log("Error: " + error.toString());
 							}
 						});
 						// Add the request to the RequestQueue.
@@ -330,6 +340,43 @@ public class AppLocationService extends Service implements LocationListener {
 
 		}
 	}
+
+    public void notifyPass(Boolean near, Float distance) {
+        Date now = new Date();
+        String title, content = "At " + DateFormat.format("hh:mm", now) +  " you were " + String.valueOf(distance) + " meters away";
+        if (near) {
+            title = "You are coming back home!";
+        } else {
+            title = "You are going out";
+        }
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(content);
+        // Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+        // The stack builder object will contain an artificial back stack for the
+        // started Activity.
+        // This ensures that navigating backward from the Activity leads out of
+        // your application to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+        // Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+        // Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // mId allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
 	
 	@Override
 	public void onProviderDisabled(String provider) {
@@ -432,8 +479,23 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 	
 	public void log(String str) {
-		Log.v("postrack", str);
-		sendLogMessageToUI(str);
+        Log.v("postrack", str);
+
+        if (str.length() > 0) {
+            appLog.add(str);
+        }
+        // remove the first line if log is too large
+        if (appLog.size() >= MAX_LOG_LINES) {
+            appLog.remove(0);
+        }
+        sendLog();
+    }
+    public void sendLog() {
+        String log = "";
+        for (String stra : appLog) {
+            log += stra + "\n";
+        }
+		sendLogMessageToUI(log);
 	}
 
 }

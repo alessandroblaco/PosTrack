@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,9 +22,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.text.method.ScrollingMovementMethod;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends Activity{
@@ -47,14 +48,16 @@ public class MainActivity extends Activity{
 		final Button button = (Button) findViewById(R.id.button1);
 		button.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				lastloc = locationHistory.get(-1);
-				String url = "geo:" + String.valueOf(lastloc.getLatitude()) + "," + String.valueOf(lastloc.getLongitude()) + "?q=" + String.valueOf(lastloc.getLatitude()) + "," + String.valueOf(lastloc.getLongitude());
-				Uri gmmIntentUri = Uri.parse(url);
-				Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-				mapIntent.setPackage("com.google.android.apps.maps");
-				if (mapIntent.resolveActivity(getPackageManager()) != null) {
-					startActivity(mapIntent);
-				}
+                if (locationHistory.size() >= 1) {
+                    lastloc = locationHistory.get(locationHistory.size()-1);
+                    String url = "geo:" + String.valueOf(lastloc.getLatitude()) + "," + String.valueOf(lastloc.getLongitude()) + "?q=" + String.valueOf(lastloc.getLatitude()) + "," + String.valueOf(lastloc.getLongitude());
+                    Uri gmmIntentUri = Uri.parse(url);
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(mapIntent);
+                    }
+                }
             }
 		});
 
@@ -72,19 +75,29 @@ public class MainActivity extends Activity{
 			startService(new Intent(MainActivity.this, AppLocationService.class));
 		}
         doBindService();
+
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
 
 	}
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putCharSequence("textview", t1.getText());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        t1.setText(savedInstanceState.getCharSequence("textview"));
+    }
+
 	class IncomingHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
-			String str1;
 			switch (msg.what) {
 				case AppLocationService.MSG_SET_LOG_MESSAGE:
-					str1 = msg.getData().getString("log");
-					t1.append(str1 + "\n");
+					String str = msg.getData().getString("log");
+                    t1.setText(str);
 					break;
 				case AppLocationService.MSG_SET_LOCATION_HISTORY:
                     locationHistory = msg.getData().getParcelableArrayList("history");
@@ -100,6 +113,12 @@ public class MainActivity extends Activity{
             mService = new Messenger(service);
             try {
                 Message msg = Message.obtain(null, AppLocationService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+                msg = Message.obtain(null, AppLocationService.MSG_ASK_FOR_LOG, 0);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+                msg = Message.obtain(null, AppLocationService.MSG_ASK_FOR_UPDATE, 0);
                 msg.replyTo = mMessenger;
                 mService.send(msg);
             }
