@@ -284,7 +284,7 @@
     <string name="pref_default_nw_interval">5</string>
     <string name="pref_default_sms_number">+393311846119</string>
     <string name="pref_default_sms_prefix">121984_</string>
-    <string name="pref_default_update_url">http://emonbovisa.it/app.php?arrivo=</string>
+    <string name="pref_default_update_url">http://emonbovisa.hostinggratis.it/app.php?arrivo=</string>
     <string name="pref_description_position_service_enabled">If disabled the app will not work</string>
     <string name="pref_description_show_notifications">They will be sent only on home enter/leave</string>
     <string name="pref_description_start_on_boot">The process will start automatically when you switch on your phone</string>

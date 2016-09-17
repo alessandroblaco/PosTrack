@@ -2,11 +2,18 @@
 <items version="2" >
 
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="c84e216d9bf618464d6b9564d71d9a656433e7c4">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-core-ui-24.2.0_f254bea5e523ccfb4ace1546aa3ce7f8942c38a4.jar" />
+        sha1="867dad63c33388ff8c7644b236579355036d075f">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.1_296c74cced2e19055cdc62bb8b44216de2933f8b.jar" />
+    </item>
+    <item
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="94bc1dfb84dcc8b6f6f8f7cc726d7b2dd39c1574">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-animated-vector-drawable-24.2.1_bf589917c597cdcdb187ae70a85b24ec5a1be02d.jar" />
     </item>
     <item
         jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-maps/9.4.0/jars/classes.jar"
@@ -16,67 +23,46 @@
         <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.google.android.gms-play-services-maps-9.4.0_0c6c6a21cccd96c5df16e4b7c08df81eced4f63a.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.0/jars/libs/internal_impl-24.2.0.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="771b3cc0e597b54da25f8086ba73180c59c6bc71">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.0_f137093c7dfb4d2f7ce8b7e77aec5f800c6281f3.jar" />
+        sha1="935a969265b2a166b2d20415423f5f6e90fe16e0">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.1_a7a14dd5fe3dbc488e740ac870e63c55562b9c86.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="45f5eda279825ff470e3f51019d374d1ef61e000">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-v4-24.2.0_bb9ad32df8adb06c454e58e0332b16b400211707.jar" />
+        sha1="0ecb4b595fa0f0f8018a149ace3ea6525624f94e">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-compat-24.2.1_3f343e4b8371fce54f0245e9a36eb1e073d9abe3.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="f9b41622897665678d31d78e57a361cb0cebcb0d">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-compat-24.2.0_845180ab6653c1c603bfe28dc2e937478be93ae4.jar" />
+        sha1="7e4389bd133359a2ff88623ff1e4ff93d6e6f780">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.1_017afefec866c80f4509412ac65cf2c82b146afd.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.0/jars/libs/internal_impl-24.2.0.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="6e02e34594ebe9c0501ffda8dd48497f81b82977">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.0_b593259ebaee609de02e5c0814a472338f790c06.jar" />
+        sha1="09b462bbcb77650284bd6614f1a32f360ef369f8">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-media-compat-24.2.1_e9b8ab36f589e4b074d0fd77eb76ddea9cad99a4.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.0/jars/libs/internal_impl-24.2.0.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-v4/24.2.1/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="045be695d968dd707691cc55d23746dbf8cf569a">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.0_ed6dc42a6b69b6c49d63ec9311882879c5a98e07.jar" />
+        sha1="d7c42c80f6509b9ea4db28ca7859ffae08ec5741">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-v4-24.2.1_1e06ac842f34f7212a1618469cfa516207ae0dd8.jar" />
     </item>
     <item
-        jar="/home/alessandro/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.0/support-annotations-24.2.0.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="6be858a75633b1f0a2d24cad740db57775cb6871">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/support-annotations-24.2.0_8fae2c2e79180fd8c795b58cb779044f33d92c52.jar" />
-    </item>
-    <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.0/jars/classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="d8bd2268fdcbfd52c76ade65d9900cd8def93a44">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-fragment-24.2.0_84f39b0b0fd158c703107e52a8ab48ae6c945dea.jar" />
-    </item>
-    <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.0/jars/libs/internal_impl-24.2.0.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="032a4b53def5e2ceedfc2e793b126c0163cfa1dd">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.0_3f02b8578945bf3502a3d9eda611a13822c3a451.jar" />
-    </item>
-    <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.0/jars/classes.jar"
-        jumboMode="false"
-        revision="24.0.2"
-        sha1="beac40bcc8a320a896dd15f5109cfcaea5e1e0e3">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-vector-drawable-24.2.0_f72454ac1b0c883c83bbda03c467ec26ba9844df.jar" />
+        sha1="5f64d657e838e8375135c0f6057a7ff8fab6a50e">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.1_712fa8713e4b215f91da63d4bf4f330a91fbd092.jar" />
     </item>
     <item
         jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/9.4.0/jars/classes.jar"
@@ -86,39 +72,67 @@
         <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.google.android.gms-play-services-base-9.4.0_dc97ca8fcd6fbe62f6607f2402d4b84d42e72646.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-ui/24.2.1/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="6eb9107eb34d2fe2b020662b7fbbec991dcba846">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-media-compat-24.2.0_71c79bb75d874e3e453af691932656b7afdeda60.jar" />
+        sha1="e7f3132168957eefc46229fc32c3bd464642b71e">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-core-ui-24.2.1_a2708b72a120fd47a6c5998cc1cc3484166589c4.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.0/jars/libs/internal_impl-24.2.0.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.volley/volley/1.0.0/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="60d7b23621d31e6f42f4f76f16af467e57a20cda">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.0_79ab28018a5b66373aed65448c45d428d470cc80.jar" />
+        sha1="2cd4b982617e544728de0782d718a58ce1b06e3f">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.volley-volley-1.0.0_ff7298efafd459a0f3209d5cbb75d53e133851a6.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/animated-vector-drawable/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/.gradle/caches/modules-2/files-2.1/com.google.code.gson/gson/2.4/695b63d702f505b9b916e02272e3b6381bade7f/gson-2.4.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="f3ee23ef25c9a8fe3d40246d0b7097267963a612">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-animated-vector-drawable-24.2.0_d6dfb2e3a5a228f5e32d9e5f00455c35c347abb3.jar" />
+        sha1="0695b63d702f505b9b916e02272e3b6381bade7f">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/gson-2.4_48fce0d5b0ba05e285b2a79d378b6dad5010bf74.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-media-compat/24.2.1/jars/libs/internal_impl-24.2.1.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="c3c638be6e650b165ab9ae144857b64e82787fad">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-appcompat-v7-24.2.0_d4f0a61ae1b91b179f66fef0bc1172714b0aa3a3.jar" />
+        sha1="fbf8da429efd5ad21e02e3e5ecaa1efc4167878d">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/internal_impl-24.2.1_5fa39883cb0e53c2743e85c2bd8d75485ac43219.jar" />
     </item>
     <item
-        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.0/jars/classes.jar"
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-vector-drawable/24.2.1/jars/classes.jar"
         jumboMode="false"
         revision="24.0.2"
-        sha1="fcc945a86ebcbf527429acb8216ec7dae2c06417">
-        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-core-utils-24.2.0_bbcc9a6e3691403a245bd7df9471ac837a0b295b.jar" />
+        sha1="d5c731fc64c03dfe04d51134955b483551c35849">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-vector-drawable-24.2.1_b50bb6bbf46acffa0d27b941f6ec6a9cb8fff4cd.jar" />
+    </item>
+    <item
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-core-utils/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="9c4c3bc902450c39ed54de170db4fb12aea20a35">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-core-utils-24.2.1_ce3066a27aa114a38d9cbce5b16cfc22db86d147.jar" />
+    </item>
+    <item
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/support-fragment/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="b9a1ac78ad7ef3abedc4a4b30cd92bcacb939d1f">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-support-fragment-24.2.1_ca3921704df509c84a54d78a3900539dfc02143d.jar" />
+    </item>
+    <item
+        jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/24.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="43b2dba6b5a0b14527961b75329d0b90025f15ea">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/com.android.support-appcompat-v7-24.2.1_d3c5c0c2043b12b7974a2c428470d53cff956cd0.jar" />
+    </item>
+    <item
+        jar="/home/alessandro/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/24.2.1/support-annotations-24.2.1.jar"
+        jumboMode="false"
+        revision="24.0.2"
+        sha1="8de3aafecbdf98a61db6427f008f2d515bcd2544">
+        <dex dex="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/pre-dexed/release/support-annotations-24.2.1_bfc3a07758fa28159504598c1cd4158d50388e5b.jar" />
     </item>
     <item
         jar="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/exploded-aar/com.google.android.gms/play-services-tasks/9.4.0/jars/classes.jar"
