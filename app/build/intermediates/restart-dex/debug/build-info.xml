@@ -4,43 +4,40 @@
     api-level="22"
     density="xhdpi"
     format="7"
-    timestamp="15966158648062"
-    token="-5085254307851098998"
-    verifier="COMPATIBLE" >
+    timestamp="24376543990848"
+    token="-5085254307851098998" >
 
     <task
         name="javac"
-        duration="409" />
+        duration="0" />
     <task
         name="instant-run-dex"
-        duration="1780" />
+        duration="0" />
     <task
         name="instant-run-transform"
-        duration="88" />
+        duration="0" />
     <task
         name="verifier"
-        duration="2" />
+        duration="0" />
 
     <artifact
-        location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/reload-dex/debug/classes.dex"
-        type="RELOAD_DEX" />
+        location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/resources-debug.ap_"
+        type="RESOURCES" />
 
-    <build timestamp="13421068666440" >
+    <build timestamp="23533171421093" >
         <artifact
             location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/outputs/apk/app-debug.apk"
             type="MAIN" />
     </build>
-    <build timestamp="15896549124657" >
+    <build timestamp="24081993236200" >
         <artifact
             location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/transforms/dex/debug/folders/1000/5/slice_1/classes.dex"
             type="DEX" />
     </build>
-    <build
-        timestamp="15966158648062"
-        verifier="COMPATIBLE" >
+    <build timestamp="24376543990848" >
         <artifact
-            location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/reload-dex/debug/classes.dex"
-            type="RELOAD_DEX" />
+            location="/home/alessandro/AndroidStudioProjects/PosTrack/app/build/intermediates/res/resources-debug.ap_"
+            type="RESOURCES" />
     </build>
 
 </instant-run>

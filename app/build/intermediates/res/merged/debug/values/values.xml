@@ -250,6 +250,7 @@
     <string name="app_name">PosTrack</string>
     <string name="button_1">Last position in Map</string>
     <string name="button_2">Location History on Maps</string>
+    <string name="button_3">Force GSM Update</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Enable</string>
     <string msgid="227660514972886228" name="common_google_play_services_enable_text"><ns1:g id="app_name">%1$s</ns1:g> won\'t work unless you enable Google Play services.</string>
     <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Enable Google Play services</string>
@@ -278,27 +279,39 @@
     <string name="pref_default_home_latitude">45.5032028</string>
     <string name="pref_default_home_longitude">9.1561746</string>
     <string name="pref_default_home_radius">2000</string>
+    <string name="pref_default_min_poll">3</string>
+    <string name="pref_default_min_time">100</string>
     <string name="pref_default_nw_interval">5</string>
+    <string name="pref_default_sms_number">+393311846119</string>
+    <string name="pref_default_sms_prefix">121984_</string>
     <string name="pref_default_update_url">http://emonbovisa.it/app.php?arrivo=</string>
     <string name="pref_description_position_service_enabled">If disabled the app will not work</string>
     <string name="pref_description_show_notifications">They will be sent only on home enter/leave</string>
     <string name="pref_description_start_on_boot">The process will start automatically when you switch on your phone</string>
     <string name="pref_description_update_url_enabled">If disabled the app will not call the URL</string>
     <string name="pref_description_use_android_provider">Use GPS or WiFi+cell position, if enabled on the phone</string>
+    <string name="pref_description_use_sms">(only if network communication fails)</string>
     <string name="pref_header_general">General</string>
+    <string name="pref_title_confidence_category">Trigger change if either</string>
     <string name="pref_title_general_category">General Settings:</string>
     <string name="pref_title_gps_interval">Update GPS every (minutes):</string>
     <string name="pref_title_home_latitude">Home latitude:</string>
     <string name="pref_title_home_longitude">Home longitude:</string>
     <string name="pref_title_home_radius">Treshold radius (m):</string>
     <string name="pref_title_location_category">GPS and WiFi location</string>
+    <string name="pref_title_min_poll">The last X positions are coherent</string>
+    <string name="pref_title_min_time">All positions older than X seconds are coherent:</string>
     <string name="pref_title_nw_interval">Update WiFi every (minutes):</string>
     <string name="pref_title_position_service_enabled">Look for position</string>
     <string name="pref_title_show_notifications">Display notifications</string>
+    <string name="pref_title_sms_category">Send update by SMS</string>
+    <string name="pref_title_sms_number">SMS addressee</string>
+    <string name="pref_title_sms_prefix">Prefix to SMS text:</string>
     <string name="pref_title_start_on_boot">Start on phone boot</string>
     <string name="pref_title_update_url">Url for updates</string>
     <string name="pref_title_update_url_enabled">Send updates</string>
     <string name="pref_title_use_android_provider">Use location provided by Android</string>
+    <string name="pref_title_use_sms">Send SMS for update</string>
     <string name="search_menu_title">Search</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="title_activity_maps">Map</string>

@@ -62,14 +62,28 @@ public class MainActivity extends Activity{
 		});
 
 
-		final Button button2 = (Button) findViewById(R.id.button2);
-		button2.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
-				MainActivity.this.startActivity(myIntent);
+        final Button button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
+                MainActivity.this.startActivity(myIntent);
 
-			}
-		});
+            }
+        });
+
+
+        final Button button3 = (Button) findViewById(R.id.button3);
+        button3.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    Message msg = Message.obtain(null, AppLocationService.MSG_ASK_FOR_GSM_UPDATE, 0);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                    // In this case the service has crashed before we could even do anything with it
+                }
+            }
+        });
 
 		if (!AppLocationService.isRunning()) {
 			startService(new Intent(MainActivity.this, AppLocationService.class));

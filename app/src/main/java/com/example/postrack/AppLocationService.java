@@ -2,15 +2,19 @@ package com.example.postrack;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TaskStackBuilder;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -25,8 +29,8 @@ import android.support.v4.app.NotificationCompat;
 import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
-import android.telephony.gsm.GsmCellLocation;
 import android.text.format.DateFormat;
 import android.util.Log;
 
@@ -60,6 +64,8 @@ public class AppLocationService extends Service implements LocationListener {
 	static final int MSG_REGISTER_CLIENT = 4;
 	static final int MSG_UNREGISTER_CLIENT = 5;
 	static final int MSG_ASK_FOR_UPDATE = 6;
+	static final int MSG_ASK_FOR_GSM_UPDATE = 7;
+
 	final Messenger mMessenger = new Messenger(new IncomingHandler()); // Target we publish for clients to send messages to IncomingHandler.
 
 	public static boolean isRunning()
@@ -68,6 +74,44 @@ public class AppLocationService extends Service implements LocationListener {
 	}
     private List<String> appLog = new ArrayList<>();
     private static final int MAX_LOG_LINES = 80;
+	SmsManager sms;
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return mMessenger.getBinder();
+	}
+
+
+	private LinkedList<Location> locationHistory = new LinkedList<>();
+	private Location lastBestLocation;
+	private Boolean GPSEnabled = true;
+	private Boolean NWEnabled = true;
+	private Boolean GSMEnabled = false;
+	private Boolean lastnear;
+	private Runnable willCheckForMovement = new Runnable() {
+		@Override
+		public void run() {
+			checkForMovement();
+		}
+	};
+	private final Handler handler = new Handler();
+	private final Service as = this;
+
+
+
+	private static final long MIN_DISTANCE_FOR_UPDATE = 100; // 100 meters
+	private PhoneStateListener telephonyListener = new PhoneStateListener() {
+		public void onServiceStateChanged(ServiceState serviceState) {
+			updateGSM();
+		}
+		public void onCellLocationChanged(CellLocation location) {
+			updateGSM();
+		}
+		public void onCellInfoChanged(List<android.telephony.CellInfo> cellInfo) {
+			updateGSM();
+		}
+	};
+
 
 	@Override
 	public void onCreate() {
@@ -82,10 +126,12 @@ public class AppLocationService extends Service implements LocationListener {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		canUseProvider = preferences.getBoolean("use_android_provider", true);
 		canUseGSM = preferences.getBoolean("position_service_enabled", true);
+		lastnear = preferences.getBoolean("last_near", false);
 		GpsProviderUpdateInterval = (int)(Float.valueOf(preferences.getString("nw_interval", "5")) * 60000f);
 		NwProviderUpdateInterval = (int)(Float.valueOf(preferences.getString("nw_interval", "5")) * 60000f);
         updateProvidersConnection();
         preferences.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+		sms = SmsManager.getDefault();
     }
 
     public void updateProvidersConnection() {
@@ -221,48 +267,157 @@ public class AppLocationService extends Service implements LocationListener {
                 case MSG_ASK_FOR_UPDATE:
                     sendLocationUpdateToUI();
                     break;
-                case MSG_ASK_FOR_LOG:
-                    sendLog();
-                    break;
+				case MSG_ASK_FOR_LOG:
+					sendLog();
+					break;
+				case MSG_ASK_FOR_GSM_UPDATE:
+					needGsmUpdate = true;
+					updateGSM();
+					break;
 				default:
 					super.handleMessage(msg);
 			}
 		}
 	}
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		return mMessenger.getBinder();
-	}
-
-
-	private LinkedList<Location> locationHistory = new LinkedList<>();
-	private Location lastBestLocation;
-	private Boolean GPSEnabled = true;
-	private Boolean NWEnabled = true;
-	private Boolean GSMEnabled = false;
-    private Boolean lastnear = false;
-
-
-	private static final long MIN_DISTANCE_FOR_UPDATE = 100; // 100 meters
-    private PhoneStateListener telephonyListener = new PhoneStateListener() {
-        public void onServiceStateChanged(ServiceState serviceState) {
-        	log("onServiceStateChanged");
-            updateGSM();
-        }
-        public void onCellLocationChanged(CellLocation location) {
-        	log("onCellLocationChanged: " + String.valueOf(((GsmCellLocation) location).getCid()));
-            updateGSM();
-        }
-        public void onCellInfoChanged(List<android.telephony.CellInfo> cellInfo) {
-        	log("onCellInfoChanged");
-            updateGSM();
-        }
-    };
-    
-
 	
 	public AppLocationService() {
+	}
+
+	public void checkForMovement() {
+		handler.removeCallbacks(willCheckForMovement);
+		Location home = new Location("home");
+		home.setLatitude(Double.valueOf(preferences.getString("home_latitude", "45.5032028")));
+		home.setLongitude(Double.valueOf(preferences.getString("home_longitude", "9.1561746")));
+		float distance = lastBestLocation.distanceTo(home);
+		float max_distance = Float.valueOf(preferences.getString("home_radius", "500.0"));
+		String arrivo;
+		Boolean near;
+		if (distance > max_distance) {
+			// we are far from home
+			log("\n" + "Distance from home is " + String.valueOf(distance) + "m: you are far away, " + (!lastnear ? "and" : "but") + " emonpi knows you are " + (lastnear ? "close" : "far away"));
+			arrivo = "0";
+			near = false;
+		} else {
+			// we are near home
+			log("\n" + "Distance from home is " + String.valueOf(distance) + "m: You are close, " + (lastnear ? "and" : "but") + " emonpi knows you are " + (lastnear ? "close" : "far away"));
+			arrivo = "1";
+			near = true;
+		}
+		if (distance > max_distance && lastnear || distance <= max_distance && !lastnear) {
+			log("So maybe we should tell emonpi...");
+			// either
+			// 		emonpi thinks we are far away but now we are close
+			// or
+			// 		emonpi thinks we are close but now we are out of the circle
+			//
+			// But maybe it's just something strange: we are on the boundary of the max_distance circle or the phone
+			// has attached to a weird antenna.
+			// We'd better check that either the last 3 positions confirm this change or that the last position is older than 3 minutes
+
+			int poll = Integer.valueOf(preferences.getString("min_poll", "3")); // default is 3 times
+			int min_time = Integer.valueOf(preferences.getString("min_time", "100")) * 1000; // default is 3 minutes
+			long act_time = min_time;
+			Date now = new Date();
+			Location loc;
+			Boolean changeForSure = false;
+			Iterator<Location> listIterator = locationHistory.descendingIterator();
+			Log.i("postrack", "Starting locationHistory iteration");
+			while (listIterator.hasNext()) {
+				loc = listIterator.next();
+				Log.i("postrack", "lat:" + String.valueOf(loc.getLatitude()) + " lon:" + String.valueOf(loc.getLatitude()) + " prov:" + loc.getProvider() + " time:" + DateFormat.format("yyyy-MM-dd hh:mm:ss", loc.getTime()) + " poll:" + String.valueOf(poll));
+				if (loc.distanceTo(home) > max_distance && near || loc.distanceTo(home) <= max_distance && !near) {
+					Log.i("postrack", "dist: " + String.valueOf(loc.distanceTo(home)) + " <> " + String.valueOf(max_distance) + " -> no, break");
+					break;
+				} else {
+					Log.i("postrack", "dist: " + String.valueOf(loc.distanceTo(home)) + " <> " + String.valueOf(max_distance) + " -> continue");
+				}
+				if (poll == 0 || loc.getTime() < now.getTime() - min_time) {
+					// We are definitely near to Home
+					changeForSure = true;
+					Log.i("postrack", "change beacause of " + (poll == 0 ? "poll" : "time"));
+					break;
+				}
+				poll--;
+				act_time = min_time - now.getTime() + loc.getTime();
+			}
+			if (changeForSure) {
+				if (poll == 0) {
+					log("Ok, it's the " + preferences.getString("min_poll", "3") + "nth time it looks like that, so it must be it");
+				} else {
+					log("Ok, " + preferences.getString("min_time", "100") + "s passed and it's still like that, so it must be it");
+				}
+
+				lastnear = distance <= max_distance;
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putBoolean("last_near", lastnear);
+				editor.apply();
+				if (preferences.getBoolean("show_notifications", false)) {
+					notifyPass(lastnear, distance);
+				}
+				String url = preferences.getString("update_url", "http://emonbovisa.it/app.php?arrivo=") + arrivo;
+				if (preferences.getBoolean("update_url_enabled", true)) {
+					log("Calling " + url);
+					RequestQueue queue = Volley.newRequestQueue(this);
+					StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+							new Response.Listener<String>() {
+								@Override
+								public void onResponse(String response) {
+									log("Response is: " + response);
+								}
+							}, new Response.ErrorListener() {
+						@Override
+						public void onErrorResponse(VolleyError error) {
+							log("Network Error: " + error.getCause().getMessage());
+							if (preferences.getBoolean("use_sms", false)) {
+								if (preferences.getString("sms_number", "").length() < 9) {
+									log(preferences.getString("sms_number", "") + " is not a valid phone number");
+								} else {
+									log("Now sending SMS \"" + preferences.getString("sms_prefix", "") + (lastnear ? "1" : "0") + "\" to " + preferences.getString("sms_number", ""));
+									PendingIntent sentPI = PendingIntent.getBroadcast(as, 0, new Intent("SMS_SENT"), 0);
+
+									registerReceiver(new BroadcastReceiver() {
+										@Override
+										public void onReceive(Context arg0, Intent arg1) {
+											int resultCode = getResultCode();
+											switch (resultCode) {
+												case Activity.RESULT_OK:
+													log("SMS sent successfully");
+													break;
+												case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+													log("SMS error: generic failure");
+													break;
+												case SmsManager.RESULT_ERROR_NO_SERVICE:
+													log("SMS error: no service");
+													break;
+												case SmsManager.RESULT_ERROR_NULL_PDU:
+													log("SMS error: null pdu");
+													break;
+												case SmsManager.RESULT_ERROR_RADIO_OFF:
+													log("SMS error: radio off");
+													break;
+											}
+										}
+									}, new IntentFilter("SMS_SENT"));
+									sms.sendTextMessage(preferences.getString("sms_number", ""), null, preferences.getString("sms_prefix", "") + (lastnear ? "1" : "0"), sentPI, null);
+								}
+							}
+						}
+					});
+					// Add the request to the RequestQueue.
+					queue.add(stringRequest);
+				} else {
+					log("Not calling url (disabled) -> " + arrivo);
+				}
+			} else {
+				// we wait a reasonable amount of time, in case no position update happen in between
+				log("We'd better wait " + String.valueOf((act_time / 1000) ) + "s, we aren't still sure enough");
+				handler.postDelayed(willCheckForMovement, act_time);
+			}
+		} else {
+			log("No need for update");
+		}
+		log("\n");
 	}
 	
 	@Override
@@ -282,62 +437,15 @@ public class AppLocationService extends Service implements LocationListener {
 					) {
 
 				locationHistory.addLast(location);
-                if (locationHistory.size() > 7) {
-                    locationHistory.pollFirst();
-                }
+				if (locationHistory.size() > 7) {
+					locationHistory.pollFirst();
+				}
 				lastBestLocation = location;
 				sendLocationUpdateToUI();
 				log("\n" + DateFormat.format("yyyy-MM-dd hh:mm:ss", location.getTime()) + ": New position from : " + location.getProvider());
-				log("Lat: " + String.valueOf(location.getLatitude()) + ", Lon: " + String.valueOf(location.getLongitude()) + "\n");
-				Location locationB = new Location("home");
-
-                locationB.setLatitude(Double.valueOf(preferences.getString("home_latitude", "45.5032028")));
-                locationB.setLongitude(Double.valueOf(preferences.getString("home_longitude", "9.1561746")));
-				float distance = location.distanceTo(locationB);
-                float max_distance = Float.valueOf(preferences.getString("home_radius", "500.0"));
-
-				log("Distance from Bovisa is " + String.valueOf(distance) +  "m");
-				String arrivo;
-				if (distance > max_distance) {
-					log("You are fare away");
-					arrivo = "0";
-				} else {
-					log("You are close to Bovisa");
-					arrivo = "1";
-				}
-
-
-                if (distance > max_distance && lastnear || distance <= max_distance && !lastnear) {
-					lastnear = distance <= max_distance;
-                    if (preferences.getBoolean("show_notifications", false)) {
-                        notifyPass(lastnear, distance);
-                    }
-                    String url = preferences.getString("update_url", "http://emonbovisa.it/app.php?arrivo=") + arrivo;
-                    if (preferences.getBoolean("update_url_enabled", true)) {
-						log("Calling " + url);
-						RequestQueue queue = Volley.newRequestQueue(this);
-						StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-								new Response.Listener<String>() {
-									@Override
-									public void onResponse(String response) {
-										log("Response is: " + response);
-									}
-								}, new Response.ErrorListener() {
-							@Override
-							public void onErrorResponse(VolleyError error) {
-                                log("Error: " + error.toString());
-							}
-						});
-						// Add the request to the RequestQueue.
-						queue.add(stringRequest);
-					} else {
-						log("Not calling url (disabled) -> " + arrivo);
-					}
-                } else {
-                    log("No need for update");
-                }
+				log("Lat: " + String.valueOf(location.getLatitude()) + ", Lon: " + String.valueOf(location.getLongitude()));
+				checkForMovement();
 			}
-
 		}
 	}
 
@@ -455,8 +563,6 @@ public class AppLocationService extends Service implements LocationListener {
 			} catch (Exception e) {
 				log("Error in GSM: " + e.toString());
 			}
-		} else {
-			log("No update because too soon");
 		}
 	}
 	

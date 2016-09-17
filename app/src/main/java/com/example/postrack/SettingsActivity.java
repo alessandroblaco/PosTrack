@@ -150,6 +150,10 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("home_radius"));
             bindPreferenceSummaryToValue(findPreference("gps_interval"));
             bindPreferenceSummaryToValue(findPreference("nw_interval"));
+            bindPreferenceSummaryToValue(findPreference("min_poll"));
+            bindPreferenceSummaryToValue(findPreference("min_time"));
+            bindPreferenceSummaryToValue(findPreference("sms_number"));
+            bindPreferenceSummaryToValue(findPreference("sms_prefix"));
         }
 
         @Override

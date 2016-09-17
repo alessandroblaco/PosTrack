@@ -7,6 +7,7 @@
     <string name="button_1">Last position in Map</string>
     <string name="title_activity_maps">Map</string>
     <string name="button_2">Location History on Maps</string>
+    <string name="button_3">Force GSM Update</string>
     <string name="title_activity_maps2">Map2</string>
     <string name="title_activity_settings">Settings</string>
 
@@ -31,7 +32,7 @@
     <string name="pref_description_show_notifications">They will be sent only on home enter/leave</string>
 
     <string name="pref_title_update_url">Url for updates</string>
-    <string name="pref_default_update_url">http://emonbovisa.it/app.php?arrivo=</string>
+    <string name="pref_default_update_url">http://emonbovisa.hostinggratis.it/app.php?arrivo=</string>
 
     <string name="pref_title_home_latitude">Home latitude:</string>
     <string name="pref_default_home_latitude">45.5032028</string>
@@ -50,4 +51,18 @@
 
     <string name="pref_title_general_category">General Settings:</string>
     <string name="pref_title_location_category">GPS and WiFi location</string>
+    <string name="pref_title_confidence_category">Trigger change if either</string>
+    <string name="pref_title_sms_category">Send update by SMS</string>
+
+    <string name="pref_title_min_poll">The last X positions are coherent</string>
+    <string name="pref_default_min_poll">3</string>
+    <string name="pref_title_min_time">All positions older than X seconds are coherent:</string>
+    <string name="pref_default_min_time">100</string>
+
+    <string name="pref_title_sms_number">SMS addressee</string>
+    <string name="pref_default_sms_number">+393311846119</string>
+    <string name="pref_title_sms_prefix">Prefix to SMS text:</string>
+    <string name="pref_default_sms_prefix">121984_</string>
+    <string name="pref_title_use_sms">Send SMS for update</string>
+    <string name="pref_description_use_sms">(only if network communication fails)</string>
 </resources>

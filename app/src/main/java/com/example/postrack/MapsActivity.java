@@ -103,10 +103,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.clear();
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             Log.v("postrack", "lat: " + preferences.getString("home_latitude", "45.5032028"));
+            LatLng home = new LatLng(Double.valueOf(preferences.getString("home_latitude", "45.5032028")),Double.valueOf(preferences.getString("home_longitude", "9.1561746")));
             mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(Double.valueOf(preferences.getString("home_latitude", "45.5032028")),Double.valueOf(preferences.getString("home_longitude", "9.1561746"))))
+                    .position(home)
                     .title("Home")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
+            mMap.addCircle(new CircleOptions()
+                    .center(home)
+                    .radius(Double.valueOf(preferences.getString("home_radius", "2000")))
+                    .strokeColor(Color.argb(220, 209, 132, 0))
+                    .strokeWidth(3));
             PolylineOptions rectOptions = new PolylineOptions();
 
             for (int i = 0; i < locationHistory.size(); i++) {
