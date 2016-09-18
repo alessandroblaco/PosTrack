@@ -488,21 +488,23 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	@Override
 	public void onProviderDisabled(String provider) {
-		log("Disabled provider: " + provider);
 
         NWEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         GPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 		if (!NWEnabled && !GPSEnabled && canUseProvider && canUseGSM) {
+			if (!GSMEnabled) {
+				log("Disabled Android location provider");
+			}
 			startGSM();
 		}
 	}
 	
 	@Override
 	public void onProviderEnabled(String provider) {
-		log("Enabled provider: " + provider);
         NWEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         GPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if ((NWEnabled || GPSEnabled) && canUseProvider) {
+			log("Enabled Android location provider: (" + (NWEnabled&&GPSEnabled ? "nw+gps" : (NWEnabled ? "nw only" : "gps only")) + ")");
             stopGSM();
         }
 	}

@@ -271,10 +271,17 @@
     <string name="common_open_on_phone">Open on phone</string>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
+    <string name="db_not_found_dialog_negative">Ok</string>
+    <string name="db_not_found_dialog_positive">Download</string>
+    <string name="db_not_found_dialog_text">File [db] not found. You can set it to another path in Advanced Settings. If you still do not have it, you can download it.</string>
+    <string name="db_not_found_dialog_title">Unable to open the cell tower database</string>
+    <string name="file_dialog_negative_button">Cancel</string>
+    <string name="file_dialog_positive_button">Choose</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyDUudUEMezjVvCgwoCAsyW6Dp01oItIRbY
     </string>
     <string name="hello_world">Hello world 1!</string>
+    <string name="pref_default_database_file">/storage/emulated/0/lacells.db</string>
     <string name="pref_default_gps_interval">5</string>
     <string name="pref_default_home_latitude">45.5032028</string>
     <string name="pref_default_home_longitude">9.1561746</string>
@@ -285,6 +292,7 @@
     <string name="pref_default_sms_number">+393311846119</string>
     <string name="pref_default_sms_prefix">121984_</string>
     <string name="pref_default_update_url">http://emonbovisa.hostinggratis.it/app.php?arrivo=</string>
+    <string name="pref_description_database_file">/sd/asa/</string>
     <string name="pref_description_position_service_enabled">If disabled the app will not work</string>
     <string name="pref_description_show_notifications">They will be sent only on home enter/leave</string>
     <string name="pref_description_start_on_boot">The process will start automatically when you switch on your phone</string>
@@ -292,7 +300,9 @@
     <string name="pref_description_use_android_provider">Use GPS or WiFi+cell position, if enabled on the phone</string>
     <string name="pref_description_use_sms">(only if network communication fails)</string>
     <string name="pref_header_general">General</string>
+    <string name="pref_title_advanced">Advanced settings</string>
     <string name="pref_title_confidence_category">Trigger change if either</string>
+    <string name="pref_title_database_file">Cell database location</string>
     <string name="pref_title_general_category">General Settings:</string>
     <string name="pref_title_gps_interval">Update GPS every (minutes):</string>
     <string name="pref_title_home_latitude">Home latitude:</string>
@@ -304,10 +314,10 @@
     <string name="pref_title_nw_interval">Update WiFi every (minutes):</string>
     <string name="pref_title_position_service_enabled">Look for position</string>
     <string name="pref_title_show_notifications">Display notifications</string>
-    <string name="pref_title_sms_category">Send update by SMS</string>
     <string name="pref_title_sms_number">SMS addressee</string>
     <string name="pref_title_sms_prefix">Prefix to SMS text:</string>
     <string name="pref_title_start_on_boot">Start on phone boot</string>
+    <string name="pref_title_update_category">Update to emon</string>
     <string name="pref_title_update_url">Url for updates</string>
     <string name="pref_title_update_url_enabled">Send updates</string>
     <string name="pref_title_use_android_provider">Use location provided by Android</string>

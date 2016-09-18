@@ -1,15 +1,19 @@
 package com.example.postrack;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
@@ -24,6 +28,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.text.method.ScrollingMovementMethod;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -92,6 +97,42 @@ public class MainActivity extends Activity{
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         preferences.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        String db_path = preferences.getString("database_file", Environment.getExternalStorageDirectory().getPath() + "/lacells.db");
+        File db_file = new File(db_path);
+
+        if (db_file.exists() && db_file.canRead()) {
+            //ok
+        } else {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+            // set title
+            alertDialogBuilder.setTitle(getResources().getString(R.string.db_not_found_dialog_title));
+
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage(getResources().getString(R.string.db_not_found_dialog_text).replace("[db]", db_path))
+                    .setCancelable(false)
+                    .setPositiveButton(getResources().getString(R.string.db_not_found_dialog_positive),new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/sobrus/FastLacellsGenerator"));
+                            startActivity(i);
+                            dialog.cancel();
+                        }
+                    })
+                    .setNegativeButton(getResources().getString(R.string.db_not_found_dialog_negative),new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, just close
+                            // the dialog box and do nothing
+                            dialog.cancel();
+                        }
+                    });
+
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+
+            // show it
+            alertDialog.show();
+        }
 
 
 	}

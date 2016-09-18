@@ -3,11 +3,15 @@ package com.example.postrack.database;
 import com.example.postrack.Settings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.io.File;
 
 
 public class CellLocationDatabase {
@@ -49,32 +53,33 @@ public class CellLocationDatabase {
 
     private QueryCache queryCache = new QueryCache();
 
-    private Settings settings;
+    private SharedPreferences preferences;
 
     public CellLocationDatabase(Context context) {
-        settings = Settings.with(context);
+        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
 
     private void openDatabase() {
         if (database == null) {
+           String db_path = preferences.getString("database_file", Environment.getExternalStorageDirectory().getPath() + "/lacells.db");
            Log.i("database", "Attempting to open database.");
-           Log.i("database", "Using directory " + settings.databaseDirectory().getPath());
+           Log.i("database", "Using db " + db_path);
+            File db_file = new File(db_path);
 
-            if (settings.currentDatabaseFile().exists() && settings.currentDatabaseFile().canRead()) {
+            if (db_file.exists() && db_file.canRead()) {
                 try {
-                    database = SQLiteDatabase.openDatabase(settings.currentDatabaseFile().getAbsolutePath(),
+                    database = SQLiteDatabase.openDatabase(db_file.getAbsolutePath(),
                             null,
                             SQLiteDatabase.NO_LOCALIZED_COLLATORS);
                 } catch (Exception e) {
                     Log.e("database", "Error opening database: "+ e.getMessage());
 
                     database = null;
-                    settings.currentDatabaseFile().delete();
                    
                 }
             } else {
-                Log.e(TAG, "Unable to open database " + settings.currentDatabaseFile());
+                Log.e(TAG, "Unable to open database " + db_path);
 
                 database = null;
             }

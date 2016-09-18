@@ -52,7 +52,7 @@
     <string name="pref_title_general_category">General Settings:</string>
     <string name="pref_title_location_category">GPS and WiFi location</string>
     <string name="pref_title_confidence_category">Trigger change if either</string>
-    <string name="pref_title_sms_category">Send update by SMS</string>
+    <string name="pref_title_update_category">Update to emon</string>
 
     <string name="pref_title_min_poll">The last X positions are coherent</string>
     <string name="pref_default_min_poll">3</string>
@@ -65,4 +65,16 @@
     <string name="pref_default_sms_prefix">121984_</string>
     <string name="pref_title_use_sms">Send SMS for update</string>
     <string name="pref_description_use_sms">(only if network communication fails)</string>
+
+    <string name="pref_title_database_file">Cell database location</string>
+    <string name="pref_description_database_file">/sd/asa/</string>
+    <string name="pref_default_database_file">/storage/emulated/0/lacells.db</string>
+    <string name="file_dialog_negative_button">Cancel</string>
+    <string name="file_dialog_positive_button">Choose</string>
+
+    <string name="db_not_found_dialog_title">Unable to open the cell tower database</string>
+    <string name="db_not_found_dialog_negative">Ok</string>
+    <string name="db_not_found_dialog_positive">Download</string>
+    <string name="db_not_found_dialog_text">File [db] not found. You can set it to another path in Advanced Settings. If you still do not have it, you can download it.</string>
+    <string name="pref_title_advanced">Advanced settings</string>
 </resources>

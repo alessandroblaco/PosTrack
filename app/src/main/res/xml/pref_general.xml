@@ -2,143 +2,149 @@
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
-    <PreferenceCategory
-        android:title="@string/pref_title_general_category"
-        android:key="general">
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_latitude"
+        android:inputType="numberSigned|numberDecimal"
+        android:key="home_latitude"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_latitude" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_longitude"
+        android:inputType="numberSigned|numberDecimal"
+        android:key="home_longitude"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_longitude" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_home_radius"
+        android:inputType="number"
+        android:key="home_radius"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:dependency="position_service_enabled"
+        android:title="@string/pref_title_home_radius"/>
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="update_url_enabled"
+        android:summary="@string/pref_description_update_url_enabled"
+        android:title="@string/pref_title_update_url_enabled" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="use_sms"
+        android:summary="@string/pref_description_use_sms"
+        android:title="@string/pref_title_use_sms" />
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="show_notifications"
+        android:summary="@string/pref_description_show_notifications"
+        android:title="@string/pref_title_show_notifications" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="start_on_boot"
+        android:summary="@string/pref_description_start_on_boot"
+        android:title="@string/pref_title_start_on_boot" />
+    <PreferenceScreen
+        android:title="@string/pref_title_advanced"
+        android:key="sms"
+        android:persistent="false">
         <SwitchPreference
             android:defaultValue="true"
             android:key="position_service_enabled"
             android:summary="@string/pref_description_position_service_enabled"
             android:title="@string/pref_title_position_service_enabled" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="update_url_enabled"
-            android:summary="@string/pref_description_update_url_enabled"
-            android:title="@string/pref_title_update_url_enabled" />
-
-        <EditTextPreference
-            android:capitalize="none"
-            android:defaultValue="@string/pref_default_update_url"
-            android:inputType="textUri"
-            android:key="update_url"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="update_url_enabled"
-            android:title="@string/pref_title_update_url" />
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_home_latitude"
-            android:inputType="numberSigned|numberDecimal"
-            android:key="home_latitude"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="position_service_enabled"
-            android:title="@string/pref_title_home_latitude" />
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_home_longitude"
-            android:inputType="numberSigned|numberDecimal"
-            android:key="home_longitude"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="position_service_enabled"
-            android:title="@string/pref_title_home_longitude" />
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_home_radius"
-            android:inputType="number"
-            android:key="home_radius"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="position_service_enabled"
-            android:title="@string/pref_title_home_radius"/>
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="start_on_boot"
-            android:summary="@string/pref_description_start_on_boot"
-            android:title="@string/pref_title_start_on_boot" />
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="show_notifications"
-            android:summary="@string/pref_description_show_notifications"
-            android:title="@string/pref_title_show_notifications" />
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_title_location_category"
-        android:key="location">
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="use_android_provider"
-            android:summary="@string/pref_description_use_android_provider"
-            android:title="@string/pref_title_use_android_provider" />
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_gps_interval"
-            android:inputType="number"
-            android:key="gps_interval"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="use_android_provider"
-            android:title="@string/pref_title_gps_interval"/>
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_nw_interval"
-            android:inputType="number"
-            android:key="nw_interval"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="use_android_provider"
-            android:title="@string/pref_title_nw_interval"/>
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_title_confidence_category"
-        android:key="confidence">
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_min_poll"
-            android:inputType="number"
-            android:key="min_poll"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/pref_title_min_poll"/>
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_min_time"
-            android:inputType="number"
-            android:key="min_time"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="use_android_provider"
-            android:title="@string/pref_title_min_time"/>
-    </PreferenceCategory>
-    <PreferenceCategory
-        android:title="@string/pref_title_sms_category"
-        android:key="sms">
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="use_sms"
-            android:summary="@string/pref_description_use_sms"
-            android:title="@string/pref_title_use_sms" />
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_sms_number"
-            android:inputType="phone"
-            android:key="sms_number"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="use_sms"
-            android:title="@string/pref_title_sms_number"/>
-        <EditTextPreference
-            android:defaultValue="@string/pref_default_sms_prefix"
-            android:inputType="text"
-            android:key="sms_prefix"
-            android:maxLines="1"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:dependency="use_sms"
-            android:title="@string/pref_title_sms_prefix"/>
-    </PreferenceCategory>
+        <com.example.postrack.FilePreference
+            android:key="database_file"
+            android:summary="@string/pref_description_database_file"
+            android:title="@string/pref_title_database_file"
+            android:negativeButtonText="@string/file_dialog_negative_button"
+            android:positiveButtonText="@string/file_dialog_positive_button"
+            android:defaultValue="@string/pref_default_database_file" />
+        <PreferenceCategory
+            android:title="@string/pref_title_update_category"
+            android:key="sms">
+            <EditTextPreference
+                android:capitalize="none"
+                android:defaultValue="@string/pref_default_update_url"
+                android:inputType="textUri"
+                android:key="update_url"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="update_url_enabled"
+                android:title="@string/pref_title_update_url" />
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_sms_number"
+                android:inputType="phone"
+                android:key="sms_number"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="use_sms"
+                android:title="@string/pref_title_sms_number"/>
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_sms_prefix"
+                android:inputType="text"
+                android:key="sms_prefix"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="use_sms"
+                android:title="@string/pref_title_sms_prefix"/>
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:title="@string/pref_title_location_category"
+            android:key="location">
+            <SwitchPreference
+                android:defaultValue="true"
+                android:key="use_android_provider"
+                android:summary="@string/pref_description_use_android_provider"
+                android:title="@string/pref_title_use_android_provider" />
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_gps_interval"
+                android:inputType="number"
+                android:key="gps_interval"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="use_android_provider"
+                android:title="@string/pref_title_gps_interval"/>
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_nw_interval"
+                android:inputType="number"
+                android:key="nw_interval"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="use_android_provider"
+                android:title="@string/pref_title_nw_interval"/>
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:title="@string/pref_title_confidence_category"
+            android:key="confidence">
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_min_poll"
+                android:inputType="number"
+                android:key="min_poll"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:title="@string/pref_title_min_poll"/>
+            <EditTextPreference
+                android:defaultValue="@string/pref_default_min_time"
+                android:inputType="number"
+                android:key="min_time"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:singleLine="true"
+                android:dependency="use_android_provider"
+                android:title="@string/pref_title_min_time"/>
+        </PreferenceCategory>
+    </PreferenceScreen>
 
 </PreferenceScreen>

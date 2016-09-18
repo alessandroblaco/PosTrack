@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -117,6 +118,7 @@ public class SettingsActivity extends PreferenceActivity {
         super.onCreate(savedInstanceState);
         setupActionBar();
         getFragmentManager().beginTransaction().replace(android.R.id.content, new GeneralPreferenceFragment()).commit();
+
     }
 
     /**
@@ -154,6 +156,14 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("min_time"));
             bindPreferenceSummaryToValue(findPreference("sms_number"));
             bindPreferenceSummaryToValue(findPreference("sms_prefix"));
+            bindPreferenceSummaryToValue(findPreference("database_file"));
+
+            findPreference("database_file").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                public boolean onPreferenceClick(Preference preference) {
+                    Log.v("postrack", "clicked " +  preference.getKey() + preference.getSummary());
+                    return true;
+                }
+            });
         }
 
         @Override
