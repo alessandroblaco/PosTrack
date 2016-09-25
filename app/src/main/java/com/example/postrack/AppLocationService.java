@@ -633,7 +633,7 @@ public class AppLocationService extends Service implements LocationListener {
 			lastGsmUpdate = new Date();
 			if (needGsmUpdate || (lastBestLocation == null || lastBestLocation.getTime() + 5*1000.0 < System.currentTimeMillis())) {
 				log("Update from GSM");
-				//try {
+				try {
 					// use antennae and database to get location
 					// to do this we use some code taken from
 					// https://github.com/n76/Local-GSM-Backend/tree/master/app/src/main/java/org/fitchfamily/android/gsmlocation
@@ -648,9 +648,9 @@ public class AppLocationService extends Service implements LocationListener {
 						// deal with the new location
 						onLocationChanged(loc);
 					}
-				//} catch (Exception e) {
-				//	log("Error in GSM: " + e.toString());
-				//}
+				} catch (Exception e) {
+					log("Error in GSM: " + e.toString());
+				}
 			}
 		}
 	}
