@@ -24,6 +24,16 @@ import java.util.List;
 public class TelephonyHelper {
     private static final String TAG = "telephonyhelper";
     private static final boolean DEBUG = true;
+    private GsmErrorReport rep;
+
+    public void setErrorLogger(GsmErrorReport erep) {
+        rep = erep;
+    }
+
+    public void log(String er) {
+        if (rep != null)
+            rep.report(er);
+    }
 
     /* Reflection-based shims to use CellInfoWcdma and stay compatible with API level 17 */
     private static class CellIdentityWcdma {
@@ -144,7 +154,7 @@ public class TelephonyHelper {
             if (DEBUG) Log.i(TAG, "getAllCellInfo()  returned null or empty set");
             return null;
         }
-
+        String lastnotfound = "";
         List<Location> rslt = new ArrayList<Location>();
         for (android.telephony.CellInfo inputCellInfo : allCells) {
             Location cellLocation = null;
@@ -152,11 +162,21 @@ public class TelephonyHelper {
                 CellInfoGsm gsm = (CellInfoGsm) inputCellInfo;
                 CellIdentityGsm id = gsm.getCellIdentity();
                 cellLocation = db.query(id.getMcc(), id.getMnc(), id.getCid(), id.getLac());
+                if (cellLocation == null && id.getMcc() > 0 && id.getMnc()> 0 && id.getCid()> 0 && id.getLac()> 0)
+                    lastnotfound = "cell not found (MCC=" + String.valueOf(id.getMcc()) +
+                            ", MNC=" + String.valueOf(id.getMnc()) +
+                            ", CID=" + String.valueOf(id.getCid()) +
+                            ", LAC=" + String.valueOf(id.getLac()) + ")";
             } else if (CellInfoWcdma.isInstance(inputCellInfo)) {
                 try {
                     CellInfoWcdma wcdma = new CellInfoWcdma(inputCellInfo);
                     CellIdentityWcdma id = wcdma.getCellIdentity();
                     cellLocation = db.query(id.getMcc(), id.getMnc(), id.getCid(), id.getLac());
+                    if (cellLocation == null && id.getMcc() > 0 && id.getMnc()> 0 && id.getCid()> 0 && id.getLac()> 0)
+                        lastnotfound = "cell not found (MCC=" + String.valueOf(id.getMcc()) +
+                                ", MNC=" + String.valueOf(id.getMnc()) +
+                                ", CID=" + String.valueOf(id.getCid()) +
+                                ", LAC=" + String.valueOf(id.getLac()) + ")";
                 } catch(IllegalAccessException e) {
                     if (DEBUG)
                         Log.i(TAG, "getAllCellInfoWrapper(), Wcdma: " + e.toString());
@@ -170,8 +190,10 @@ public class TelephonyHelper {
                 rslt.add(cellLocation);
             }
         }
-        if (rslt.isEmpty())
+        if (rslt.isEmpty()) {
+            log(lastnotfound);
             return null;
+        }
         return rslt;
     }
 
@@ -196,10 +218,17 @@ public class TelephonyHelper {
             Location cellLocInfo = db.query(mcc, mnc, cell.getCid(), cell.getLac());
             if (cellLocInfo != null)
                 rslt.add(cellLocInfo);
-            else if (DEBUG)
-                Log.i(TAG, "Unknown cell tower detected: mcc="+mcc+
-                        ", mnc="+mcc+", cid="+cell.getCid()+", lac="+cell.getLac());
+            else {
+                if (mcc != 0 && cell.getCid() != 0 && cell.getLac() != 0)
+                    log("cell not found (MCC=" + mcc +
+                        ", CID=" + String.valueOf(cell.getCid()) +
+                        ", LAC=" + String.valueOf(cell.getLac()) + ")");
+                if (DEBUG)
+                    Log.i(TAG, "Unknown cell tower detected: mcc="+mcc+
+                            ", mnc="+mcc+", cid="+cell.getCid()+", lac="+cell.getLac());
+            }
         } else {
+            log("no cell from teleponymanager");
             if (DEBUG)
                 Log.i(TAG, "getCellLocation() returned null or no GsmCellLocation.");
         }
@@ -237,6 +266,7 @@ public class TelephonyHelper {
             rslt = legacyGetCellTowers();
         }
         if ((rslt == null) || rslt.isEmpty()) {
+            log("no tower information");
             if (DEBUG) Log.i(TAG, "getTowerLocations(): No tower information.");
             return null;
         }
@@ -308,12 +338,17 @@ public class TelephonyHelper {
         rslt.setTime(System.currentTimeMillis());
         return rslt;
     }
+    interface GsmErrorReport {
+        void report(String result);
+    }
 
     public synchronized Location getLocationEstimate() {
     	
-        if (tm == null)
+        if (tm == null) {
             return null;
-        Location loc = weightedAverage("gsm", getTowerLocations());
+        }
+        Collection<Location> tlocations = getTowerLocations();
+        Location loc = weightedAverage("gsm", tlocations);
         if (loc == null)
             return null;
         loc.setProvider("gsm");

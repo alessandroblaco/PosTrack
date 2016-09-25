@@ -4,7 +4,7 @@
     <string name="app_name">PosTrack</string>
     <string name="hello_world">Hello world 1!</string>
     <string name="action_settings">Settings</string>
-    <string name="button_1">Last position in Map</string>
+    <string name="button_1">Export unknown cells</string>
     <string name="title_activity_maps">Map</string>
     <string name="button_2">Location History on Maps</string>
     <string name="button_3">Force GSM Update</string>
@@ -40,7 +40,7 @@
     <string name="pref_title_home_longitude">Home longitude:</string>
     <string name="pref_default_home_longitude">9.1561746</string>
 
-    <string name="pref_title_home_radius">Treshold radius (m):</string>
+    <string name="pref_title_home_radius">Threshold radius (m):</string>
     <string name="pref_default_home_radius">2000</string>
 
     <string name="pref_title_gps_interval">Update GPS every (minutes):</string>
@@ -61,6 +61,8 @@
 
     <string name="pref_title_sms_number">SMS addressee</string>
     <string name="pref_default_sms_number">+393311846119</string>
+    <string name="pref_title_device_name">Device name</string>
+    <string name="pref_default_device_name">Asdrubale</string>
     <string name="pref_title_sms_prefix">Prefix to SMS text:</string>
     <string name="pref_default_sms_prefix">121984_</string>
     <string name="pref_title_use_sms">Send SMS for update</string>

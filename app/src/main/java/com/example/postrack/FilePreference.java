@@ -1,7 +1,9 @@
 package com.example.postrack;
 
 /**
- * Created by alessandro on 18/09/16.
+ * This is the dialog of the database location preference. It is
+ * basically an extension of a DialogPreference with a list of files/folders that
+ * gets updated as the user navigates into it
  */
 import android.app.Dialog;
 import android.content.Context;

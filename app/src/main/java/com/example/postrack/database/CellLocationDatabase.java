@@ -54,8 +54,11 @@ public class CellLocationDatabase {
     private QueryCache queryCache = new QueryCache();
 
     private SharedPreferences preferences;
+    private UnknownCellDb unknownCellDb;
+    private Context context;
 
-    public CellLocationDatabase(Context context) {
+    public CellLocationDatabase(Context c) {
+        context = c;
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -72,6 +75,7 @@ public class CellLocationDatabase {
                     database = SQLiteDatabase.openDatabase(db_file.getAbsolutePath(),
                             null,
                             SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+                    unknownCellDb = new UnknownCellDb(context);
                 } catch (Exception e) {
                     Log.e("database", "Error opening database: "+ e.getMessage());
 
@@ -168,10 +172,12 @@ public class CellLocationDatabase {
                 } else {
                     Log.i(TAG, "DB Cursor empty for: " + args.toString());
                     queryCache.putUnresolved(args);
+                    unknownCellDb.addUnknownCell(mcc, mnc, cid, lac);
                 }
             } else {
                 Log.i(TAG, "DB Cursor null for: " + args.toString());
                 queryCache.putUnresolved(args);
+                unknownCellDb.addUnknownCell(mcc, mnc, cid, lac);
             }
 
             return null;

@@ -29,6 +29,15 @@
         android:singleLine="true"
         android:dependency="position_service_enabled"
         android:title="@string/pref_title_home_radius"/>
+    <EditTextPreference
+        android:capitalize="none"
+        android:defaultValue="@string/pref_default_device_name"
+        android:inputType="textUri"
+        android:key="device_name"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="@string/pref_title_device_name" />
     <SwitchPreference
         android:defaultValue="true"
         android:key="update_url_enabled"

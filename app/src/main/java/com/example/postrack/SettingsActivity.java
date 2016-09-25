@@ -157,6 +157,7 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("sms_number"));
             bindPreferenceSummaryToValue(findPreference("sms_prefix"));
             bindPreferenceSummaryToValue(findPreference("database_file"));
+            bindPreferenceSummaryToValue(findPreference("device_name"));
 
             findPreference("database_file").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 public boolean onPreferenceClick(Preference preference) {

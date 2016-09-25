@@ -84,6 +84,7 @@ public class AppLocationService extends Service implements LocationListener {
 
 	private LinkedList<Location> locationHistory = new LinkedList<>();
 	private Location lastBestLocation;
+	private Date lastGsmUpdate;
 	private Boolean GPSEnabled = true;
 	private Boolean NWEnabled = true;
 	private Boolean GSMEnabled = false;
@@ -101,6 +102,7 @@ public class AppLocationService extends Service implements LocationListener {
 
 	private static final long MIN_DISTANCE_FOR_UPDATE = 100; // 100 meters
 	private PhoneStateListener telephonyListener = new PhoneStateListener() {
+		// When something changes in the telephone state, we update the GSM location
 		public void onServiceStateChanged(ServiceState serviceState) {
 			updateGSM();
 		}
@@ -122,6 +124,15 @@ public class AppLocationService extends Service implements LocationListener {
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
         telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
         telephonyHelper = new TelephonyHelper(this);
+		telephonyHelper.setErrorLogger(
+				// set error reporter for GSM locator, so as to show some errors in the app log
+				new TelephonyHelper.GsmErrorReport() {
+					@Override
+					public void report(String result) {
+						log("GSM Error: " + result);
+					}
+				}
+		);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		canUseProvider = preferences.getBoolean("use_android_provider", true);
@@ -133,9 +144,13 @@ public class AppLocationService extends Service implements LocationListener {
         preferences.registerOnSharedPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 		sms = SmsManager.getDefault();
     }
+// this is called at startup and when some preferences changes.
+// It mainly applies to changes the "Use location provided by Android" and "Look for position",
+// "Update GPS every (minutes)" and "Update WiFi every (minutes)" settings
 
-    public void updateProvidersConnection() {
-        if (canUseProvider  && canUseGSM) {
+	public void updateProvidersConnection() {
+		if (canUseProvider  && canUseGSM) {
+			// if all providers are available, request updates from NW and GPS
             try {
 				locationManager.removeUpdates(this);
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
@@ -146,6 +161,10 @@ public class AppLocationService extends Service implements LocationListener {
                 log("Permission error: " + e.toString());
             }
 
+
+
+			// check if network provider is enabled and calls onProvider*abled accordingly.
+			// If enabled update the position to the last one known by the provider
             if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
                 try {
                     onLocationChanged(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER));
@@ -157,6 +176,9 @@ public class AppLocationService extends Service implements LocationListener {
                 onProviderDisabled(LocationManager.NETWORK_PROVIDER);
             }
 
+
+			// check if GPS provider is enabled and calls onProvider*abled accordingly.
+			// If enabled update the position to the last one known by the provider
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 try {
                     onLocationChanged(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
@@ -169,6 +191,7 @@ public class AppLocationService extends Service implements LocationListener {
             }
         } else {
             try {
+				// ask not to receive no more updates from NW and GPS
                 locationManager.removeUpdates(this);
             } catch (SecurityException e) {
                 log("Permission error: " + e.toString());
@@ -176,6 +199,7 @@ public class AppLocationService extends Service implements LocationListener {
             GPSEnabled = false;
             NWEnabled = false;
 			if (canUseGSM) {
+				// if can use GSM ("Look for position" settings) start or update position from GSM
 				if (!GSMEnabled) {
 					startGSM();
 				} else {
@@ -183,6 +207,7 @@ public class AppLocationService extends Service implements LocationListener {
 					updateGSM();
 				}
 			} else {
+				// if cannot use GSM ("Look for position" settings) stop getting GSM updates
 				stopGSM();
 			}
         }
@@ -191,6 +216,7 @@ public class AppLocationService extends Service implements LocationListener {
     private OnSharedPreferenceChangeListener sBindPreferenceSummaryToValueListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+			// When one of these settings is changed, apply the new setting
             switch (key) {
                 case "use_android_provider":
                     canUseProvider = sharedPreferences.getBoolean(key, false);
@@ -218,11 +244,11 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 
 	private void sendLocationUpdateToUI() {
+		// Notify a location update to the UI (map). The last 10 positions are provided
 		for (int i=mClients.size()-1; i>=0; i--) {
 			try {
 				//Send data as a String
 				Bundle b = new Bundle();
-				/*b.putString("history", new Gson().toJson(locationHistory));*/
 				Message msg = Message.obtain(null, MSG_SET_LOCATION_HISTORY);
                 ArrayList<Location> al = new ArrayList<>();
                 al.addAll(locationHistory);
@@ -239,6 +265,7 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 
 	private void sendLogMessageToUI(String tmsg) {
+		// add a log in the UI
 		for (int i=mClients.size()-1; i>=0; i--) {
 			try {
 				//Send data as a String
@@ -265,12 +292,15 @@ public class AppLocationService extends Service implements LocationListener {
 					mClients.remove(msg.replyTo);
 					break;
                 case MSG_ASK_FOR_UPDATE:
+					// the client asks for the position history
                     sendLocationUpdateToUI();
                     break;
 				case MSG_ASK_FOR_LOG:
+					// the client asks for the whole log
 					sendLog();
 					break;
 				case MSG_ASK_FOR_GSM_UPDATE:
+					// the client asks for a forced GSM update
 					needGsmUpdate = true;
 					updateGSM();
 					break;
@@ -285,14 +315,17 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 
 	public void checkForMovement() {
-		handler.removeCallbacks(willCheckForMovement);
+		// check from location history whether the phone is leaving or is arriving (or none)
+		handler.removeCallbacks(willCheckForMovement); // if there was a timeout waiting to check the movement, remove it
+		// constructing a location representing the home
 		Location home = new Location("home");
 		home.setLatitude(Double.valueOf(preferences.getString("home_latitude", "45.5032028")));
 		home.setLongitude(Double.valueOf(preferences.getString("home_longitude", "9.1561746")));
-		float distance = lastBestLocation.distanceTo(home);
+		float distance = lastBestLocation.distanceTo(home); // calculate the distance between home and the last known position of the phone
 		float max_distance = Float.valueOf(preferences.getString("home_radius", "500.0"));
 		String arrivo;
 		Boolean near;
+		// compare the distance with the boundary radius
 		if (distance > max_distance) {
 			// we are far from home
 			log("\n" + "Distance from home is " + String.valueOf(distance) + "m: you are far away, " + (!lastnear ? "and" : "but") + " emonpi knows you are " + (lastnear ? "close" : "far away"));
@@ -313,70 +346,96 @@ public class AppLocationService extends Service implements LocationListener {
 			//
 			// But maybe it's just something strange: we are on the boundary of the max_distance circle or the phone
 			// has attached to a weird antenna.
-			// We'd better check that either the last 3 positions confirm this change or that the last position is older than 3 minutes
+			// We'd better check that either the last 3 positions confirm this change or that the last position is older than 100 seconds
 
 			int poll = Integer.valueOf(preferences.getString("min_poll", "3")); // default is 3 times
-			int min_time = Integer.valueOf(preferences.getString("min_time", "100")) * 1000; // default is 3 minutes
+			int min_time = Integer.valueOf(preferences.getString("min_time", "100")) * 1000; // default is 100 seconds
 			long act_time = min_time;
 			Date now = new Date();
 			Location loc;
-			Boolean changeForSure = false;
-			Iterator<Location> listIterator = locationHistory.descendingIterator();
+			Boolean changeForSure = false; // by default we do not change our mind. Only if the 3 times or the 100s conditions are verified we do it
+			Iterator<Location> listIterator = locationHistory.descendingIterator(); // iterate from the most recent to the oldest
 			Log.i("postrack", "Starting locationHistory iteration");
+			// loop through the location history (from the most recent to the oldest) to check the 3 times and 100s condition
 			while (listIterator.hasNext()) {
 				loc = listIterator.next();
 				Log.i("postrack", "lat:" + String.valueOf(loc.getLatitude()) + " lon:" + String.valueOf(loc.getLatitude()) + " prov:" + loc.getProvider() + " time:" + DateFormat.format("yyyy-MM-dd hh:mm:ss", loc.getTime()) + " poll:" + String.valueOf(poll));
 				if (loc.distanceTo(home) > max_distance && near || loc.distanceTo(home) <= max_distance && !near) {
+					// there is a position which is not coherent with the last one (before we reached any condition)
 					Log.i("postrack", "dist: " + String.valueOf(loc.distanceTo(home)) + " <> " + String.valueOf(max_distance) + " -> no, break");
+					// it makes no sense to go on, we exit from the cycle and let changeForSure be false
 					break;
 				} else {
 					Log.i("postrack", "dist: " + String.valueOf(loc.distanceTo(home)) + " <> " + String.valueOf(max_distance) + " -> continue");
 				}
-				if (poll == 0 || loc.getTime() < now.getTime() - min_time) {
-					// We are definitely near to Home
+				if (poll == 0 // if the 3 times condition has been satisfied
+						|| // or
+					loc.getTime() < now.getTime() - min_time // if the 100s condition has been satisfied
+				) {
+					// We are definitely near to Home: we set changeForSure to true and we exit the cycle
 					changeForSure = true;
 					Log.i("postrack", "change beacause of " + (poll == 0 ? "poll" : "time"));
 					break;
 				}
-				poll--;
-				act_time = min_time - now.getTime() + loc.getTime();
+				poll--; // another location is coherent, maybe we get to 3 times
+				act_time = min_time - now.getTime() + loc.getTime(); // the time we should wait with no new uncoherent
+				// location to satisfy the 100s condition. It is used to set a timer to make another check if
+				// no condition is satisfied
 			}
 			if (changeForSure) {
+				// We just tell which is the satisfied condition
 				if (poll == 0) {
 					log("Ok, it's the " + preferences.getString("min_poll", "3") + "nth time it looks like that, so it must be it");
 				} else {
 					log("Ok, " + preferences.getString("min_time", "100") + "s passed and it's still like that, so it must be it");
 				}
-
+				// so we update the "last near status"
 				lastnear = distance <= max_distance;
+				// and we save it as a preference, so that if the app crashes/is killed this value is preserved
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putBoolean("last_near", lastnear);
 				editor.apply();
 				if (preferences.getBoolean("show_notifications", false)) {
+					// if the user wants it, we show a notification in the phone
 					notifyPass(lastnear, distance);
 				}
-				String url = preferences.getString("update_url", "http://emonbovisa.it/app.php?arrivo=") + arrivo;
+				// we build the HTTP GET request url, using parameters arrivo and phone
+				String url = preferences.getString("update_url", "http://emonbovisa.hostinggratis.it/app.php?arrivo=") + arrivo + "&phone=" + preferences.getString("device_name", "Asdrubale");
 				if (preferences.getBoolean("update_url_enabled", true)) {
+					// if the user is allowing for the update
 					log("Calling " + url);
+					// we create the request
 					RequestQueue queue = Volley.newRequestQueue(this);
 					StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
 							new Response.Listener<String>() {
 								@Override
 								public void onResponse(String response) {
+									// if it is successful we are done
 									log("Response is: " + response);
 								}
 							}, new Response.ErrorListener() {
 						@Override
 						public void onErrorResponse(VolleyError error) {
-							log("Network Error: " + error.getCause().getMessage());
+							//if there is an error
+							if (error.getCause() != null) {
+								log("Network Error: " + error.getCause().getMessage());
+							} else {
+								log("Network Error: " + error.getMessage());
+							}
 							if (preferences.getBoolean("use_sms", false)) {
+								// if the user wants to use the sms communication
 								if (preferences.getString("sms_number", "").length() < 9) {
+									//check for number validity
 									log(preferences.getString("sms_number", "") + " is not a valid phone number");
 								} else {
-									log("Now sending SMS \"" + preferences.getString("sms_prefix", "") + (lastnear ? "1" : "0") + "\" to " + preferences.getString("sms_number", ""));
+									// if the number is ok we build the SMS message: 131984_<<near>>_<<phone>>
+									String sms_text = preferences.getString("sms_prefix", "") + (lastnear ? "1" : "0") + "_" + preferences.getString("device_name", "Asdrubale");
+									log("Now sending SMS \"" + sms_text + "\" to " + preferences.getString("sms_number", ""));
+
 									PendingIntent sentPI = PendingIntent.getBroadcast(as, 0, new Intent("SMS_SENT"), 0);
 
 									registerReceiver(new BroadcastReceiver() {
+										// build the receiver (check if sms was actually sent)
 										@Override
 										public void onReceive(Context arg0, Intent arg1) {
 											int resultCode = getResultCode();
@@ -399,14 +458,16 @@ public class AppLocationService extends Service implements LocationListener {
 											}
 										}
 									}, new IntentFilter("SMS_SENT"));
-									sms.sendTextMessage(preferences.getString("sms_number", ""), null, preferences.getString("sms_prefix", "") + (lastnear ? "1" : "0"), sentPI, null);
+									// send sms
+									sms.sendTextMessage(preferences.getString("sms_number", ""), null, sms_text, sentPI, null);
 								}
 							}
 						}
 					});
-					// Add the request to the RequestQueue.
+					// Add the request to the RequestQueue (run the request).
 					queue.add(stringRequest);
 				} else {
+					// if the user has forbidden server updates
 					log("Not calling url (disabled) -> " + arrivo);
 				}
 			} else {
@@ -422,11 +483,12 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	@Override
 	public void onLocationChanged(Location location) {
+		// check if location is valid
 		if (location == null) {
 			log("Null location");
 		} else {
 			log("Location changed from : " + location.getProvider());
-			if (
+			if (// check priority: if gps is enabled it makes no sense using gsm position
 					(lastBestLocation != null && lastBestLocation.getProvider().equals("gsm"))
 							||
 							(location.getProvider().equals(LocationManager.GPS_PROVIDER))
@@ -437,13 +499,16 @@ public class AppLocationService extends Service implements LocationListener {
 					) {
 
 				locationHistory.addLast(location);
+				// limit the location history to the last 7 positions
 				if (locationHistory.size() > 7) {
 					locationHistory.pollFirst();
 				}
 				lastBestLocation = location;
+				// update the map
 				sendLocationUpdateToUI();
 				log("\n" + DateFormat.format("yyyy-MM-dd hh:mm:ss", location.getTime()) + ": New position from : " + location.getProvider());
 				log("Lat: " + String.valueOf(location.getLatitude()) + ", Lon: " + String.valueOf(location.getLongitude()));
+				// check if the position change is meaningfule (i.e. if the user is leaving or entering home
 				checkForMovement();
 			}
 		}
@@ -451,6 +516,7 @@ public class AppLocationService extends Service implements LocationListener {
 
     public void notifyPass(Boolean near, Float distance) {
         Date now = new Date();
+		// build the notification text
         String title, content = "At " + DateFormat.format("hh:mm", now) +  " you were " + String.valueOf(distance) + " meters away";
         if (near) {
             title = "You are coming back home!";
@@ -482,7 +548,8 @@ public class AppLocationService extends Service implements LocationListener {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // mId allows you to update the notification later on.
+        // mId allows you to update the notification later on. We keep the same id so as to use always
+		// the same notification
         mNotificationManager.notify(1, mBuilder.build());
     }
 	
@@ -495,6 +562,7 @@ public class AppLocationService extends Service implements LocationListener {
 			if (!GSMEnabled) {
 				log("Disabled Android location provider");
 			}
+			// if GPS and NW are disabled and the user settings does not prevent it, we start GSM positioning
 			startGSM();
 		}
 	}
@@ -505,34 +573,42 @@ public class AppLocationService extends Service implements LocationListener {
         GPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if ((NWEnabled || GPSEnabled) && canUseProvider) {
 			log("Enabled Android location provider: (" + (NWEnabled&&GPSEnabled ? "nw+gps" : (NWEnabled ? "nw only" : "gps only")) + ")");
-            stopGSM();
+            // GPS or NW were enabled and we are allowed to use them: we should no more need GSM positioning
+			stopGSM();
         }
 	}
 	
 	public void startGSM() {
 		if (!GSMEnabled) {
+			//check if it is not already started
 			GSMEnabled = true;
 			log("Started GSM");
+			// binds event listener: when the phone status changes, updateGSM() will be called
 			telephonyManager.listen(
 				telephonyListener,
 				PhoneStateListener.LISTEN_CELL_INFO |
 				PhoneStateListener.LISTEN_CELL_LOCATION |
 				PhoneStateListener.LISTEN_SERVICE_STATE
 			);
+			// force Gsm update lookup
             needGsmUpdate = true;
+			//lets do an update right away
 			updateGSM();
 		}
 	}
 	
 	public void stopGSM() {
 		if (GSMEnabled) {
+			// check it was not already disabled
 			GSMEnabled = false;
 			log("Stopped GSM");
+			// remove event listeners
 			telephonyManager.listen(
 					telephonyListener,
 					PhoneStateListener.LISTEN_NONE
 				);
             if (canUseProvider && canUseGSM) {
+				// if it is allowed, restart GPS and NW positioning
                 try {
                     locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, this, null);
                     locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
@@ -552,18 +628,29 @@ public class AppLocationService extends Service implements LocationListener {
 	}
 	
 	public void updateGSM() {
-		if (needGsmUpdate || (lastBestLocation == null || lastBestLocation.getTime() + 5*1000.0 < System.currentTimeMillis())) {
-			log("Update from GSM");
-			try {
-				Location loc = telephonyHelper.getLocationEstimate();
-				if (loc == null) {
-					log("Failed...");
-				} else {
-                    needGsmUpdate = false;
-					onLocationChanged(loc);
-				}
-			} catch (Exception e) {
-				log("Error in GSM: " + e.toString());
+		// avoid multiple update within 5 seconds
+		if (needGsmUpdate || lastGsmUpdate.getTime() + 500 < System.currentTimeMillis()) {
+			lastGsmUpdate = new Date();
+			if (needGsmUpdate || (lastBestLocation == null || lastBestLocation.getTime() + 5*1000.0 < System.currentTimeMillis())) {
+				log("Update from GSM");
+				//try {
+					// use antennae and database to get location
+					// to do this we use some code taken from
+					// https://github.com/n76/Local-GSM-Backend/tree/master/app/src/main/java/org/fitchfamily/android/gsmlocation
+					// in particular these classes where adopted and slightly modified:
+					// TelephonyHelper, CellLocationDatabase, LocarionCalculator, LocationHelper,
+					// QueryArgs, QueryCache, SqlWhereBuilder
+
+					Location loc = telephonyHelper.getLocationEstimate();
+					if (loc != null)  {
+						// reset forced update
+						needGsmUpdate = false;
+						// deal with the new location
+						onLocationChanged(loc);
+					}
+				//} catch (Exception e) {
+				//	log("Error in GSM: " + e.toString());
+				//}
 			}
 		}
 	}
@@ -588,7 +675,7 @@ public class AppLocationService extends Service implements LocationListener {
 	
 	public void log(String str) {
         Log.v("postrack", str);
-
+		// add the string to the array of log
         if (str.length() > 0) {
             appLog.add(str);
         }
@@ -596,13 +683,16 @@ public class AppLocationService extends Service implements LocationListener {
         if (appLog.size() >= MAX_LOG_LINES) {
             appLog.remove(0);
         }
+		// update log in UI
         sendLog();
     }
     public void sendLog() {
+		// array to text
         String log = "";
         for (String stra : appLog) {
             log += stra + "\n";
         }
+		// ask ui update
 		sendLogMessageToUI(log);
 	}
 
